@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Dharma Fun! 🕉️ (Ages 3–6)</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Baloo 2','Comic Sans MS',cursive;background:radial-gradient(ellipse at top,#FEF3C7 0%,#FFFBEB 65%,#FEF9EE 100%);min-height:100vh}
+#app{max-width:430px;margin:0 auto;padding:14px;min-height:100vh}
+button{cursor:pointer;touch-action:manipulation;font-family:'Baloo 2',cursive}
+button:active{transform:scale(0.92)!important}
+.bb{background:white;font-weight:800;border-radius:14px;padding:8px 18px;font-size:14px;margin-bottom:14px;display:block;border-width:2.5px;border-style:solid}
+.mc{aspect-ratio:1;border-radius:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;border-width:2.5px;border-style:solid;transition:all .18s}
+.mc:active{transform:scale(0.86)!important}
+.tile{border-radius:22px;padding:18px 8px;border-width:3px;border-style:solid;transition:transform .12s;font-family:'Baloo 2',cursive}
+.tile:active{transform:scale(0.91)!important}
+</style>
+</head>
+<body>
+<div id="app"><div style="text-align:center;padding:40px;font-size:48px">🕉️</div></div>
+<script>
+const APP=document.getElementById('app');
+const H=s=>APP.innerHTML=s;
+
+/* ── Palette ── */
+const C={o:"#FF6B35",g:"#F59E0B",pk:"#EC4899",m:"#991B1B",pu:"#7C3AED",gr:"#059669",tl:"#0D9488"};
+
+/* ── Data ── */
+const GODS={ganesh:{e:"🐘",n:"Ganesh"},krishna:{e:"🦚",n:"Krishna"},hanuman:{e:"💪",n:"Hanuman"},lakshmi:{e:"🪔",n:"Lakshmi"},rama:{e:"🏹",n:"Rama"},shiva:{e:"🔱",n:"Shiva"},durga:{e:"⚔️",n:"Durga"},saraswati:{e:"🎵",n:"Saraswati"},parvati:{e:"🌸",n:"Parvati"}};
+const SPOTS=[
+  {c:"Who loves BUTTER? 🧈",t:"krishna",o:["ganesh","krishna","hanuman","lakshmi"]},
+  {c:"Who has the TRISHUL? 🔱",t:"shiva",o:["rama","shiva","ganesh","krishna"]},
+  {c:"Who lifted the MOUNTAIN? ⛰️",t:"hanuman",o:["hanuman","rama","shiva","lakshmi"]},
+  {c:"Who plays the FLUTE? 🎵",t:"krishna",o:["saraswati","krishna","ganesh","durga"]},
+  {c:"Who has ELEPHANT HEAD? 🐘",t:"ganesh",o:["ganesh","hanuman","krishna","shiva"]},
+  {c:"Who uses BOW & ARROW? 🏹",t:"rama",o:["hanuman","durga","rama","krishna"]},
+  {c:"Who rides a LION? 🦁",t:"durga",o:["lakshmi","durga","saraswati","shiva"]},
+  {c:"Who sits on a LOTUS? 🪷",t:"lakshmi",o:["saraswati","lakshmi","durga","ganesh"]},
+  {c:"Who is Rama's best friend? 🐒",t:"hanuman",o:["krishna","hanuman","shiva","ganesh"]},
+  {c:"Who plays the VEENA? 🎶",t:"saraswati",o:["saraswati","lakshmi","durga","parvati"]},
+];
+const MEM_KEYS=["ganesh","krishna","hanuman","lakshmi","rama","shiva"];
+const STORIES=[
+  {title:"Rama & Ravana",emoji:"🏹",col:C.o,slides:[{e:"👑",t:"Rama was a kind and brave prince!"},{e:"👿",t:"Evil Ravana took Sita away! 😢"},{e:"🐒",t:"Hanuman flew across the ocean to find Sita!"},{e:"⚔️",t:"Rama and Hanuman defeated Ravana! 💥"},{e:"🪔",t:"Everyone lit diyas! That's Diwali! 🎉"}]},
+  {title:"Ganesha's Race",emoji:"🐘",col:"#D97706",slides:[{e:"🏁",t:"Race around the whole world to win! 🌍"},{e:"💨",t:"Kartikeya ran super fast around Earth!"},{e:"🐘",t:"Ganesha walked slowly around Mama & Papa..."},{e:"❤️",t:"My parents ARE my whole world! 💕"},{e:"🏆",t:"Ganesha won! Love your parents always! 🙏"}]},
+  {title:"Baby Krishna",emoji:"🦚",col:C.pu,slides:[{e:"👶",t:"Baby Krishna loved BUTTER so much! 🧈"},{e:"🏺",t:"Mama Yashoda kept butter high up!"},{e:"🧗",t:"Clever Krishna climbed on his friends!"},{e:"🤝",t:"Krishna shared butter with everyone! ❤️"},{e:"💙",t:"Always share — just like Krishna! 🦚"}]},
+  {title:"Prahlad & Holi",emoji:"🌈",col:C.pk,slides:[{e:"👦",t:"Little Prahlad loved praying to Vishnu! 🙏"},{e:"😡",t:"His mean dad hated Vishnu! 👿"},{e:"🔥",t:"Evil Holika tried to burn Prahlad!"},{e:"✨",t:"Vishnu saved Prahlad — he was totally safe!"},{e:"🌈",t:"We throw colors on Holi to celebrate! 🎊"}]},
+];
+const SHLOKAS=[
+  {title:"Ganesh Mantra",deity:"🐘",col:C.o,hindi:"वक्रतुण्ड महाकाय\nसूर्यकोटि समप्रभ",roman:"Vakratunda Mahakaya\nSuryakoti Samaprabha",meaning:"O Lord Ganesha, please remove all my obstacles!"},
+  {title:"Om Namah Shivaya",deity:"🔱",col:C.pu,hindi:"ॐ नमः शिवाय\nॐ नमः शिवाय",roman:"Om Namah Shivaya\nOm Namah Shivaya",meaning:"I bow to Lord Shiva with love!"},
+  {title:"Gayatri Mantra",deity:"☀️",col:C.g,hindi:"ॐ भूर्भुवः स्वः\nतत्सवितुर्वरेण्यम्",roman:"Om Bhur Bhuva Swah\nTat Savitur Varenyam",meaning:"Dear Sun God, please make me wise!"},
+];
+
+/* ── Helpers ── */
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const stars=(n,t)=>Array.from({length:t},(_,i)=>`<span style="opacity:${i<n?1:.15}">⭐</span>`).join('');
+const bb=(col,a,v='',lbl='← Home')=>`<button class="bb" style="border-color:${col};color:${col}" data-a="${a}" data-v="${v}">${lbl}</button>`;
+const tb=(lbl,a,v,bg,ex='')=>`<button style="background:${bg};color:white;border:none;border-radius:18px;padding:14px 28px;font-size:17px;font-weight:800;font-family:'Baloo 2',cursive;${ex}" data-a="${a}" data-v="${v}">${lbl}</button>`;
+
+/* ── State ── */
+const G={screen:'home',
+  dy:{seq:[],pSeq:[],lit:-1,phase:'intro',level:0,locked:false},
+  sp:{pool:[],qi:0,picked:null,score:0,done:false,opts:[]},
+  m:{cards:[],sel:[],moves:0,won:false,locked:false},
+  st:{chosen:null,slide:0},
+  sh:{si:0,chanting:false,count:0}
+};
+
+/* ── Init functions ── */
+function initDiya(){Object.assign(G.dy,{seq:[],pSeq:[],lit:-1,phase:'intro',level:0,locked:false});}
+function initSpot(){G.sp.pool=shuf([...SPOTS]);G.sp.qi=0;G.sp.picked=null;G.sp.score=0;G.sp.done=false;G.sp.opts=shuf([...G.sp.pool[0].o]);}
+function initMem(){
+  const items=MEM_KEYS.map(id=>({id,...GODS[id]}));
+  G.m.cards=shuf([...items.map((c,i)=>({...c,k:'a'+i,f:false,m:false})),...items.map((c,i)=>({...c,k:'b'+i,f:false,m:false}))]);
+  G.m.sel=[];G.m.moves=0;G.m.won=false;G.m.locked=false;
+}
+
+/* ── Diya game logic ── */
+function startDiya(prev){
+  const ns=[...prev,Math.floor(Math.random()*6)];
+  G.dy.seq=ns;G.dy.pSeq=[];G.dy.lit=-1;G.dy.phase='showing';G.dy.locked=true;render();
+  let i=0;
+  (function tick(){
+    if(i>=ns.length){G.dy.lit=-1;G.dy.phase='playing';G.dy.locked=false;render();return;}
+    G.dy.lit=ns[i];render();
+    setTimeout(()=>{G.dy.lit=-1;render();setTimeout(()=>{i++;tick();},280);},620);
+  })();
+}
+function tapDiya(idx){
+  if(G.dy.locked||G.dy.phase!=='playing')return;
+  const np=[...G.dy.pSeq,idx];const pos=np.length-1;
+  G.dy.lit=idx;render();setTimeout(()=>{if(G.dy.phase==='playing'){G.dy.lit=-1;render();}},250);
+  if(np[pos]!==G.dy.seq[pos]){G.dy.phase='wrong';G.dy.locked=true;render();return;}
+  G.dy.pSeq=np;
+  if(np.length===G.dy.seq.length){G.dy.level++;G.dy.phase='levelup';render();setTimeout(()=>startDiya(G.dy.seq),1200);}
+  else render();
+}
+
+/* ── Memory game logic ── */
+function tapMem(idx){
+  if(G.m.locked||G.m.cards[idx].f||G.m.cards[idx].m)return;
+  G.m.cards[idx].f=true;G.m.sel.push(idx);
+  if(G.m.sel.length===2){
+    G.m.locked=true;G.m.moves++;
+    const[a,b]=G.m.sel;
+    if(G.m.cards[a].id===G.m.cards[b].id){
+      setTimeout(()=>{G.m.cards[a].m=true;G.m.cards[b].m=true;G.m.sel=[];G.m.locked=false;G.m.won=G.m.cards.every(c=>c.m);render();},400);
+    }else{setTimeout(()=>{G.m.cards[a].f=false;G.m.cards[b].f=false;G.m.sel=[];G.m.locked=false;render();},900);}
+  }
+  render();
+}
+
+/* ── Screen HTML builders ── */
+function homeHTML(){
+  const tiles=[
+    {id:'diya', e:'🪔',t:'Diya Game!',   s:'Simon Says — light them!',col:'#EA580C',bg:'#FFF5EE'},
+    {id:'spot', e:'🔍',t:'Spot the God!',s:'Find the right one!',     col:C.pu,     bg:'#F5F0FF'},
+    {id:'mem',  e:'🃏',t:'Match Cards',  s:'Find the pairs!',          col:C.tl,     bg:'#EEFAFA'},
+    {id:'story',e:'📖',t:'Epic Stories', s:'Brave tales!',             col:C.gr,     bg:'#EEFAF5'},
+    {id:'sh',   e:'🕉️',t:'Shlokas',      s:'Chant together!',          col:C.pk,     bg:'#FFF0F7'},
+  ];
+  return`<div style="padding:20px 4px;text-align:center">
+    <div style="font-size:50px;margin-bottom:4px">🕉️</div>
+    <h1 style="margin:0;font-size:28px;font-weight:800;color:${C.m};letter-spacing:-1px">Dharma Fun!</h1>
+    <p style="margin:4px 0 22px;color:#B45309;font-size:13px;font-weight:700">For Little Learners 🌸 (Ages 3–6)</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:400px;margin:0 auto">
+      ${tiles.map(g=>`<button class="tile" style="background:${g.bg};border-color:${g.col};box-shadow:0 4px 16px ${g.col}44;${g.id==='sh'?'grid-column:1/-1':''}" data-a="go" data-v="${g.id}">
+        <div style="font-size:34px;margin-bottom:6px">${g.e}</div>
+        <div style="font-size:15px;font-weight:800;color:${g.col}">${g.t}</div>
+        <div style="font-size:11px;color:#6B7280;margin-top:3px">${g.s}</div>
+      </button>`).join('')}
+    </div>
+    <div style="margin-top:24px;font-size:18px;letter-spacing:10px;color:${C.g}">🌸🪔🌸🪔🌸</div>
+  </div>`;
+}
+
+function diyaHTML(){
+  const msgs={intro:'Watch the diyas glow, then tap in the same order! 🪔',showing:'👀 Watch very carefully...',playing:'👆 Now tap in the SAME order!',wrong:`❌ Oops! You got to level ${G.dy.seq.length-1}!`,levelup:'🎉 Amazing! Adding one more diya!'};
+  const diyas=Array.from({length:6},(_,i)=>{
+    const lit=G.dy.lit===i,iswrong=G.dy.phase==='wrong'&&G.dy.pSeq.at(-1)===i;
+    return`<button style="font-size:${lit?50:38}px;background:${lit?'#FEF3C7':iswrong?'#FEE2E2':'white'};border:3px solid ${lit?'#F59E0B':iswrong?'#DC2626':'#FDE68A'};border-radius:20px;padding:10px;width:100%;aspect-ratio:1;box-shadow:${lit?'0 0 24px rgba(245,158,11,.8)':iswrong?'0 0 14px rgba(220,38,38,.5)':'none'};transform:${lit?'scale(1.18)':iswrong?'scale(.9)':'scale(1)'};transition:all .15s;cursor:${G.dy.phase==='playing'?'pointer':'default'}" data-a="dy-tap" data-v="${i}">🪔</button>`;
+  }).join('');
+  return`<div>
+    ${bb(C.o,'go','home')}
+    <div style="text-align:center;margin-bottom:4px;font-size:22px;font-weight:800;color:${C.m}">🪔 Light the Diyas!</div>
+    ${G.dy.level>0?`<div style="text-align:center;font-size:14px;color:${C.g};font-weight:800;margin-bottom:4px">Level ${G.dy.level} ${'⭐'.repeat(Math.min(G.dy.level,8))}</div>`:''}
+    <div style="text-align:center;font-size:13px;color:#B45309;margin-bottom:20px;min-height:18px">${msgs[G.dy.phase]||''}</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:300px;margin:0 auto 24px">${diyas}</div>
+    <div style="text-align:center">
+      ${G.dy.phase==='intro'?tb('Start! 🪔','dy-start','','#EA580C','box-shadow:0 4px 16px rgba(234,88,12,.5)'):G.dy.phase==='wrong'?tb('Try Again! 💪','dy-reset','','#EA580C'):''}
+    </div>
+  </div>`;
+}
+
+function spotHTML(){
+  if(G.sp.done)return`<div style="text-align:center;padding:20px">
+    ${bb(C.pu,'go','home')}
+    <div style="font-size:64px;margin-top:16px">🏆</div>
+    <div style="font-size:22px;font-weight:800;color:${C.m};margin-top:8px">शाबाश!</div>
+    <div style="font-size:16px;color:#B45309;margin-top:6px">${G.sp.score}/${G.sp.pool.length} correct! 🌟</div>
+    <div style="font-size:22px;margin:8px 0">${stars(G.sp.score,G.sp.pool.length)}</div>
+    ${tb('Play Again! 🎮','sp-restart','',C.pu,'margin-top:10px')}
+  </div>`;
+  const q=G.sp.pool[G.sp.qi];
+  const opts=G.sp.opts.map(g=>{
+    const god=GODS[g];
+    let bg='white',bd='3px solid #E5E7EB',tc='#374151';
+    if(G.sp.picked!==null){if(g===q.t){bg='#D1FAE5';bd=`3px solid ${C.gr}`;tc=C.gr;}else if(G.sp.picked===g){bg='#FEE2E2';bd='3px solid #DC2626';tc='#DC2626';}}
+    return`<button style="background:${bg};border:${bd};border-radius:22px;padding:20px 8px;font-family:'Baloo 2',cursive;width:100%;transition:all .2s" data-a="sp-pick" data-v="${g}">
+      <div style="font-size:48px">${god?.e||'❓'}</div>
+      <div style="font-size:15px;font-weight:800;color:${tc};margin-top:8px">${god?.n||g}</div>
+    </button>`;
+  }).join('');
+  return`<div>
+    ${bb(C.pu,'go','home')}
+    <div style="text-align:center;font-size:20px;font-weight:800;color:${C.m};margin-bottom:4px">🔍 Spot the God!</div>
+    <div style="text-align:center;font-size:13px;color:#B45309;margin-bottom:16px">Q ${G.sp.qi+1}/${G.sp.pool.length} · Score: ${G.sp.score} ⭐</div>
+    <div style="background:white;border-radius:24px;padding:22px 16px;border:3px solid ${C.pu};box-shadow:0 6px 20px ${C.pu}33;margin-bottom:20px;text-align:center">
+      <div style="font-size:26px;font-weight:800;color:#1F2937;line-height:1.4">${q.c}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:380px;margin:0 auto 14px">${opts}</div>
+    ${G.sp.picked!==null?`<div style="text-align:center">${tb(G.sp.qi>=G.sp.pool.length-1?'See Score! 🏆':'Next →','sp-next','',G.sp.picked===q.t?C.gr:'#F59E0B','width:100%')}</div>`:''
+    }
+  </div>`;
+}
+
+function memHTML(){
+  if(G.m.won)return`<div style="text-align:center;padding:28px 16px">
+    ${bb(C.o,'go','home')}
+    <div style="font-size:70px">🏆</div>
+    <div style="font-size:22px;font-weight:800;color:${C.gr};margin-top:8px">शाबाश! You did it!</div>
+    <div style="color:#6B7280;margin-top:4px">${G.m.moves} moves! 🌟</div>
+    ${tb('Play Again! 🎮','m-reset','',C.o,'margin-top:20px')}
+  </div>`;
+  const cards=G.m.cards.map((c,i)=>{
+    const show=c.f||c.m;
+    return`<div class="mc" style="background:${c.m?'#D1FAE5':show?'#FFF8EE':`linear-gradient(135deg,${C.o},${C.g})`};border-color:${c.m?C.gr:show?C.o:'rgba(255,107,53,.3)'};box-shadow:${c.m?'0 0 10px rgba(5,150,105,.3)':'none'}" data-a="m-tap" data-v="${i}">
+      ${show?`<div style="font-size:22px">${c.e}</div><div style="font-size:8px;font-weight:800;color:#374151;margin-top:1px">${c.n}</div>`:'<div style="font-size:20px">🕉️</div>'}
+    </div>`;
+  }).join('');
+  return`<div>
+    ${bb(C.o,'go','home')}
+    <div style="text-align:center;margin-bottom:12px">
+      <div style="font-size:22px;font-weight:800;color:${C.m}">🃏 Match the Cards!</div>
+      <div style="color:#B45309;font-size:13px">Find the pairs! Moves: ${G.m.moves} 🌟</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;max-width:400px;margin:0 auto">${cards}</div>
+  </div>`;
+}
+
+function storyHTML(){
+  if(G.st.chosen===null)return`<div>
+    ${bb(C.gr,'go','home')}
+    <div style="text-align:center;font-size:20px;font-weight:800;color:${C.m};margin-bottom:18px">📖 Epic Stories</div>
+    <div style="display:flex;flex-direction:column;gap:12px;max-width:400px;margin:0 auto">
+      ${STORIES.map((st,i)=>`<button style="background:white;border:3px solid ${st.col};border-radius:20px;padding:16px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 4px 14px ${st.col}33;font-family:'Baloo 2',cursive;width:100%" data-a="st-pick" data-v="${i}">
+        <div style="font-size:38px">${st.emoji}</div>
+        <div style="text-align:left"><div style="font-size:16px;font-weight:800;color:${st.col}">${st.title}</div><div style="font-size:11px;color:#6B7280">${st.slides.length} slides 📖</div></div>
+      </button>`).join('')}
+    </div>
+  </div>`;
+  const st=STORIES[G.st.chosen];const sl=st.slides[G.st.slide];const isLast=G.st.slide===st.slides.length-1;
+  return`<div style="text-align:center">
+    <button class="bb" style="border-color:${st.col};color:${st.col}" data-a="st-back" data-v="">← Stories</button>
+    <div style="font-size:16px;font-weight:800;color:${st.col};margin-bottom:14px">${st.emoji} ${st.title}</div>
+    <div style="background:white;border-radius:26px;padding:32px 22px;border:3px solid ${st.col};box-shadow:0 8px 28px ${st.col}44;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:18px">
+      <div style="font-size:70px;margin-bottom:16px">${sl.e}</div>
+      <div style="font-size:18px;font-weight:700;color:#1F2937;line-height:1.5;max-width:280px">${sl.t}</div>
+    </div>
+    <div style="margin-bottom:18px">${st.slides.map((_,i)=>`<span style="width:11px;height:11px;border-radius:50%;background:${i<=G.st.slide?st.col:'#E5E7EB'};display:inline-block;margin:0 4px;cursor:pointer;transition:background .3s" data-a="st-dot" data-v="${i}"></span>`).join('')}</div>
+    ${isLast?`<div style="font-size:18px;font-weight:800;color:${C.gr};margin-bottom:12px">🎉 The End! Great job!</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      ${tb('Read Again! 🔄','st-restart','',st.col)}
+      <button style="background:white;color:${st.col};border:2px solid ${st.col};border-radius:18px;padding:14px 22px;font-size:15px;font-weight:800;font-family:'Baloo 2',cursive" data-a="st-back" data-v="">More 📖</button>
+    </div>`:tb('Next →','st-next','',st.col,'padding:16px 56px;font-size:19px;box-shadow:0 4px 16px '+st.col+'55')}
+  </div>`;
+}
+
+function shlokaHTML(){
+  const s=SHLOKAS[G.sh.si];
+  return`<div>
+    ${bb(C.pk,'go','home')}
+    <div style="text-align:center;font-size:20px;font-weight:800;color:${C.m};margin-bottom:4px">🕉️ Sacred Shlokas</div>
+    ${G.sh.count>0?`<div style="text-align:center;font-size:13px;color:${C.g};font-weight:700;margin-bottom:8px">You chanted ${G.sh.count} times! 🙏</div>`:'<div style="margin-bottom:10px"></div>'}
+    <div style="background:white;border-radius:26px;padding:22px 18px;border:3px solid ${s.col};box-shadow:0 8px 28px ${s.col}44;text-align:center;margin-bottom:16px">
+      <div style="font-size:${G.sh.chanting?62:52}px;display:inline-block;transition:font-size .25s">${s.deity}</div>
+      ${G.sh.chanting?`<div style="font-size:13px;color:${s.col};font-weight:700;letter-spacing:3px;margin-top:4px">🔔 ॐ ॐ ॐ 🔔</div>`:''}
+      <div style="font-size:16px;font-weight:800;color:${s.col};margin:10px 0 12px">${s.title}</div>
+      <div style="font-size:18px;color:#1F2937;font-weight:700;line-height:2.1;margin-bottom:10px;white-space:pre-line">${s.hindi}</div>
+      <div style="font-size:12px;color:#6B7280;margin-bottom:10px">${s.roman}</div>
+      <div style="background:#FEF3C7;border-radius:12px;padding:10px 12px;font-size:13px;color:#92400E">💡 ${s.meaning}</div>
+    </div>
+    <button style="width:100%;background:${G.sh.chanting?C.gr:s.col};color:white;border:none;border-radius:18px;padding:16px;font-size:18px;font-weight:800;font-family:'Baloo 2',cursive;margin-bottom:14px;box-shadow:0 4px 16px ${s.col}55;transition:background .3s" data-a="sh-chant">${G.sh.chanting?'🔔 Chanting... 🙏':'🙏 Tap to Chant!'}</button>
+    <div style="display:flex;justify-content:center;gap:8px">
+      ${SHLOKAS.map((sh,i)=>`<button style="font-size:22px;background:${i===G.sh.si?sh.col:'#FEF3C7'};border:2.5px solid ${sh.col};border-radius:50%;width:46px;height:46px;display:inline-flex;align-items:center;justify-content:center;transition:all .2s" data-a="sh-pick" data-v="${i}">${sh.deity}</button>`).join('')}
+    </div>
+  </div>`;
+}
+
+/* ── Render ── */
+function render(){
+  const screens={home:homeHTML,diya:diyaHTML,spot:spotHTML,mem:memHTML,story:storyHTML,sh:shlokaHTML};
+  H((screens[G.screen]||homeHTML)());
+}
+
+/* ── Events ── */
+APP.addEventListener('click',e=>{
+  const el=e.target.closest('[data-a]');if(!el)return;
+  const a=el.dataset.a,v=el.dataset.v;
+  switch(a){
+    case'go': G.screen=v;
+      if(v==='diya')initDiya();else if(v==='spot')initSpot();
+      else if(v==='mem')initMem();else if(v==='story'){G.st.chosen=null;G.st.slide=0;}
+      else if(v==='sh')G.sh.chanting=false;
+      break;
+    case'dy-tap': tapDiya(parseInt(v));return;
+    case'dy-start': startDiya([]);return;
+    case'dy-reset': initDiya();break;
+    case'sp-pick':
+      if(G.sp.picked!==null)return;
+      G.sp.picked=v;if(v===G.sp.pool[G.sp.qi].t)G.sp.score++;break;
+    case'sp-next':
+      if(G.sp.qi>=G.sp.pool.length-1){G.sp.done=true;}
+      else{G.sp.qi++;G.sp.picked=null;G.sp.opts=shuf([...G.sp.pool[G.sp.qi].o]);}break;
+    case'sp-restart': initSpot();break;
+    case'm-tap': tapMem(parseInt(v));return;
+    case'm-reset': initMem();break;
+    case'st-pick': G.st.chosen=parseInt(v);G.st.slide=0;break;
+    case'st-back': G.st.chosen=null;break;
+    case'st-next': G.st.slide++;break;
+    case'st-restart': G.st.slide=0;break;
+    case'st-dot': G.st.slide=parseInt(v);break;
+    case'sh-pick': G.sh.si=parseInt(v);G.sh.chanting=false;break;
+    case'sh-chant':
+      G.sh.chanting=true;G.sh.count++;render();
+      setTimeout(()=>{G.sh.chanting=false;render();},2000);return;
+  }
+  render();
+});
+
+initMem();initSpot();render();
+</script>
+</body></html>

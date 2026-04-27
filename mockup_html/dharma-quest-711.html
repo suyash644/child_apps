@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Dharma Quest! 📚 (Ages 7–11)</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Baloo 2',sans-serif;background:linear-gradient(135deg,#EFF6FF 0%,#F0FDF4 50%,#EFF6FF 100%);min-height:100vh}
+#app{max-width:430px;margin:0 auto;padding:14px;min-height:100vh}
+button{cursor:pointer;touch-action:manipulation;font-family:'Baloo 2',sans-serif}
+button:active{transform:scale(0.93)!important}
+.bb{background:white;font-weight:800;border-radius:14px;padding:8px 18px;font-size:14px;margin-bottom:14px;display:block;border-width:2.5px;border-style:solid}
+.tile{border-radius:22px;padding:22px 8px;border-width:3px;border-style:solid;transition:transform .12s;font-family:'Baloo 2',sans-serif}
+.tile:active{transform:scale(0.91)!important}
+.opt-btn{border-radius:16px;padding:14px 16px;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14px;text-align:left;width:100%;transition:all .2s;border-width:1.5px;border-style:solid}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const APP=document.getElementById('app');
+const H=s=>APP.innerHTML=s;
+
+const C={blue:'#2563EB',orange:'#D97706',purple:'#7C3AED',teal:'#0D9488',green:'#059669',maroon:'#991B1B',gold:'#F59E0B',pink:'#EC4899'};
+
+/* ── Data ── */
+const WORDS=[
+  {w:'GANESH',  h:'Elephant God 🐘',    e:'🐘'},{w:'KRISHNA', h:'Flute player 🦚',   e:'🦚'},
+  {w:'HANUMAN', h:"Rama's monkey devotee 💪",e:'💪'},{w:'DIWALI',h:'Festival of Lights 🪔',e:'🪔'},
+  {w:'RAMAYANA',h:'Epic story of Rama 🏹',e:'🏹'},{w:'SHIVA',h:'God with Trishul 🔱',e:'🔱'},
+  {w:'DURGA',   h:'Warrior Goddess ⚔️',  e:'⚔️'},{w:'LAKSHMI',h:'Goddess of wealth 💰',e:'🪔'},
+  {w:'HOLI',    h:'Festival of Colors 🌈',e:'🌈'},{w:'DHARMA', h:'Righteous duty 🕉️',  e:'🕉️'},
+  {w:'KARMA',   h:'Your actions decide fate ⚡',e:'⚡'},{w:'VEDAS',h:'Ancient scriptures 📜',e:'📜'},
+];
+const TIMELINES=[
+  {title:'Ramayana — The Journey',col:C.orange,emoji:'🏹',events:[
+    {t:'Rama is born as prince of Ayodhya',o:1},{t:'Rama is exiled to the forest for 14 years',o:2},
+    {t:'Ravana kidnaps Sita and takes her to Lanka',o:3},{t:'Hanuman crosses the ocean to find Sita',o:4},
+    {t:'Rama defeats Ravana and rescues Sita',o:5},{t:'Rama returns home — people light Diyas!',o:6},
+  ]},
+  {title:"Krishna's Life",col:C.purple,emoji:'🦚',events:[
+    {t:'Krishna is born in a prison in Mathura',o:1},{t:'Baby Krishna steals butter from everyone',o:2},
+    {t:'Krishna defeats the giant serpent Kaliya',o:3},{t:'Krishna lifts Govardhan Mountain',o:4},
+    {t:'Krishna gives Arjuna the Bhagavad Gita',o:5},{t:'Pandavas win the Kurukshetra War',o:6},
+  ]},
+  {title:"Ganesha's Story",col:C.gold,emoji:'🐘',events:[
+    {t:'Parvati creates Ganesha from clay',o:1},{t:'Ganesha guards his mother Parvati\'s door',o:2},
+    {t:'Shiva does not know Ganesha and they fight',o:3},{t:'Ganesha\'s head is cut off by Shiva',o:4},
+    {t:'Shiva replaces Ganesha\'s head with an elephant\'s',o:5},
+    {t:'Ganesha becomes the first god to be worshipped!',o:6},
+  ]},
+];
+const QUIZ=[
+  {q:'Who wrote the Ramayana?',o:['Valmiki','Vyasa','Tulsidas','Kalidasa'],ok:0,f:'Sage Valmiki wrote the original Ramayana in Sanskrit!'},
+  {q:'How many days did the Kurukshetra War last?',o:['18 days','7 days','30 days','14 days'],ok:0,f:'The great Mahabharata war lasted exactly 18 days!'},
+  {q:"Who is Arjuna's charioteer in the Mahabharata?",o:['Krishna','Hanuman','Bhima','Yudhishthir'],ok:0,f:'Krishna himself became the charioteer — and gave the Bhagavad Gita!'},
+  {q:'How many arms does Goddess Durga have?',o:['8 arms','4 arms','6 arms','10 arms'],ok:0,f:'Durga has 8 arms, each holding a different weapon!'},
+  {q:"What is Vishnu's giant eagle vehicle?",o:['Garuda','Peacock','Swan','Nandi'],ok:0,f:'Garuda the giant eagle carries Lord Vishnu!'},
+  {q:'Navratri means how many nights?',o:['9 nights','7 nights','5 nights','11 nights'],ok:0,f:'Nava=9, Ratri=night — nine nights of Goddess Durga!'},
+  {q:'The Bhagavad Gita has how many chapters?',o:['18','12','7','24'],ok:0,f:'The Gita has 18 chapters — same as the 18 days of war!'},
+  {q:'Who is the twin brother of Lord Rama?',o:['Lakshmana','Bharata','Shatrughna','None'],ok:0,f:'Rama had three brothers: Lakshmana, Bharata, and Shatrughna!'},
+  {q:'Who wrote the Mahabharata?',o:['Vyasa','Valmiki','Brahma','Narada'],ok:0,f:'Sage Vyasa composed the Mahabharata — world\'s longest epic!'},
+  {q:"What is Ganesha's tiny vehicle?",o:['Mouse','Peacock','Swan','Owl'],ok:0,f:'A tiny mouse carries mighty Ganesha everywhere!'},
+  {q:"Karna's mother was?",o:['Kunti','Gandhari','Draupadi','Sita'],ok:0,f:'Karna was born to Kunti — he was the eldest Pandava by birth!'},
+  {q:'What are the 4 Vedas?',o:['Rig, Sama, Yajur, Atharva','Rig, Ram, Gita, Purana','Veda, Gita, Purana, Upanishad','None of these'],ok:0,f:'Four Vedas: Rigveda, Samaveda, Yajurveda, and Atharvaveda!'},
+];
+const PAIRS_SETS=[
+  {title:'Gods & Their Vehicles 🚗',col:C.teal,pairs:[
+    {l:{e:'🐘',t:'Ganesh'},r:{e:'🐭',t:'Mouse'}},{l:{e:'🦚',t:'Krishna'},r:{e:'🦚',t:'Peacock'}},
+    {l:{e:'🔱',t:'Shiva'},r:{e:'🐂',t:'Nandi Bull'}},{l:{e:'🪔',t:'Lakshmi'},r:{e:'🦉',t:'Owl'}},
+    {l:{e:'🎵',t:'Saraswati'},r:{e:'🦢',t:'Swan'}},{l:{e:'⚔️',t:'Durga'},r:{e:'🦁',t:'Lion'}},
+  ]},
+  {title:'Gods & Their Weapons ⚔️',col:C.pink,pairs:[
+    {l:{e:'🔱',t:'Shiva'},r:{e:'🔱',t:'Trishul'}},{l:{e:'🏹',t:'Rama'},r:{e:'🏹',t:'Bow & Arrow'}},
+    {l:{e:'💪',t:'Hanuman'},r:{e:'🪵',t:'Mace (Gada)'}},{l:{e:'⚔️',t:'Durga'},r:{e:'⚔️',t:'Many swords'}},
+    {l:{e:'🦚',t:'Krishna'},r:{e:'💫',t:'Sudarshana Chakra'}},{l:{e:'🐘',t:'Ganesh'},r:{e:'🪝',t:'Ankush (hook)'}},
+  ]},
+];
+
+/* ── Helpers ── */
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const stars=(n,t)=>Array.from({length:t},(_,i)=>`<span style="opacity:${i<n?1:.15}">⭐</span>`).join('');
+const bb=(col,a,v='',lbl='← Home')=>`<button class="bb" style="border-color:${col};color:${col}" data-a="${a}" data-v="${v}">${lbl}</button>`;
+const pb=(lbl,a,v,bg,ex='')=>`<button style="background:${bg};color:white;border:none;border-radius:14px;padding:12px 22px;font-size:15px;font-weight:800;font-family:'Baloo 2',sans-serif;${ex}" data-a="${a}" data-v="${v}">${lbl}</button>`;
+const prog=(n,t,col)=>`<div style="height:8px;background:#E5E7EB;border-radius:99px;margin-bottom:14px;overflow:hidden"><div style="height:100%;background:${col};border-radius:99px;width:${Math.round(n/t*100)}%;transition:width .4s"></div></div>`;
+
+/* ── State ── */
+const G={screen:'home',
+  ws:{words:[],wi:0,letters:[],typed:[],status:'playing',score:0,done:false},
+  tl:{ti:0,events:[],placed:[],score:0,done:false},
+  qz:{pool:[],qi:0,picked:null,score:0,done:false},
+  pm:{pi:0,lsel:null,matched:[],score:0,done:false,shuffledR:[]}
+};
+
+/* ── Init ── */
+function initWS(){G.ws.words=shuf([...WORDS]);G.ws.wi=0;G.ws.score=0;G.ws.done=false;setupWSWord();}
+function setupWSWord(){const w=G.ws.words[G.ws.wi].w;G.ws.letters=shuf(w.split('').map((l,i)=>({l,i,used:false})));G.ws.typed=[];G.ws.status='playing';}
+function initTL(){G.tl.ti=0;G.tl.score=0;G.tl.done=false;setupTL();}
+function setupTL(){G.tl.events=shuf([...TIMELINES[G.tl.ti].events]);G.tl.placed=[];}
+function initQZ(){G.qz.pool=shuf([...QUIZ]).slice(0,8);G.qz.qi=0;G.qz.picked=null;G.qz.score=0;G.qz.done=false;}
+function initPM(){G.pm.pi=0;G.pm.lsel=null;G.pm.matched=[];G.pm.score=0;G.pm.done=false;G.pm.shuffledR=shuf(PAIRS_SETS[0].pairs.map(p=>p.r));}
+function setupPM(){G.pm.lsel=null;G.pm.matched=[];G.pm.shuffledR=shuf(PAIRS_SETS[G.pm.pi].pairs.map(p=>p.r));}
+
+/* ── Word Scramble logic ── */
+function wsTapLetter(idx){
+  if(G.ws.letters[idx].used||G.ws.status!=='playing')return;
+  G.ws.letters[idx].used=true;G.ws.typed.push({...G.ws.letters[idx],idx});
+  const attempt=G.ws.typed.map(x=>x.l).join('');const word=G.ws.words[G.ws.wi].w;
+  if(G.ws.typed.length===word.length){
+    if(attempt===word){G.ws.status='correct';G.ws.score++;
+      setTimeout(()=>{if(G.ws.wi>=G.ws.words.length-1){G.ws.done=true;}else{G.ws.wi++;setupWSWord();}render();},1400);
+    }else{G.ws.status='wrong';
+      setTimeout(()=>{G.ws.letters.forEach(l=>l.used=false);G.ws.typed=[];G.ws.status='playing';render();},900);}
+  }
+  render();
+}
+function wsDelete(){
+  if(!G.ws.typed.length||G.ws.status!=='playing')return;
+  const last=G.ws.typed.pop();G.ws.letters[last.idx].used=false;render();
+}
+
+/* ── Timeline logic ── */
+function tlTap(order){
+  const ev=G.tl.events.find(e=>e.o===order);if(!ev||G.tl.placed.find(p=>p.o===order))return;
+  const next=G.tl.placed.length+1;
+  if(order===next){
+    G.tl.placed.push(ev);
+    if(G.tl.placed.length===TIMELINES[G.tl.ti].events.length){
+      G.tl.score++;
+      setTimeout(()=>{if(G.tl.ti>=TIMELINES.length-1){G.tl.done=true;}else{G.tl.ti++;setupTL();}render();},1400);
+    }
+  }else{/* wrong tap — highlight handled via CSS class on re-render */}
+  render();
+}
+
+/* ── Screen builders ── */
+function homeHTML(){
+  const tiles=[
+    {id:'ws',e:'🔤',t:'Word Scramble',  s:'Unscramble Hindu words!',  col:C.blue,  bg:'#EFF6FF'},
+    {id:'tl',e:'📋',t:'Put in Order!',  s:'Sort epic events!',         col:C.orange,bg:'#FFF7ED'},
+    {id:'qz',e:'🧠',t:'Deep Quiz',      s:'Epic & scripture facts!',   col:C.purple,bg:'#F5F3FF'},
+    {id:'pm',e:'🔗',t:'Match the Pairs',s:'God + vehicle / weapon!',   col:C.teal,  bg:'#F0FDFA'},
+  ];
+  return`<div style="padding:20px 4px;text-align:center">
+    <div style="font-size:12px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:2px">Ages 7–11</div>
+    <div style="font-size:46px;margin:6px 0 4px">📚</div>
+    <h1 style="margin:0;font-size:26px;font-weight:800;color:${C.maroon};letter-spacing:-1px">Dharma Quest!</h1>
+    <p style="margin:4px 0 22px;color:#B45309;font-size:13px;font-weight:700">Puzzles • Epics • Knowledge 🌟</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:400px;margin:0 auto">
+      ${tiles.map(g=>`<button class="tile" style="background:${g.bg};border-color:${g.col};box-shadow:0 4px 16px ${g.col}33" data-a="go" data-v="${g.id}">
+        <div style="font-size:34px;margin-bottom:8px">${g.e}</div>
+        <div style="font-size:14px;font-weight:800;color:${g.col}">${g.t}</div>
+        <div style="font-size:11px;color:#6B7280;margin-top:3px">${g.s}</div>
+      </button>`).join('')}
+    </div>
+    <div style="margin-top:24px;font-size:16px;letter-spacing:10px;color:${C.gold}">📜🕉️📜🕉️📜</div>
+  </div>`;
+}
+
+function wsHTML(){
+  if(G.ws.done)return`<div style="text-align:center;padding:20px">
+    ${bb(C.blue,'go','home')}
+    <div style="font-size:60px;margin-top:16px">🏆</div>
+    <div style="font-size:22px;font-weight:800;color:${C.maroon};margin-top:8px">Word Master!</div>
+    <div style="font-size:16px;color:#B45309;margin-top:6px">${G.ws.score}/${G.ws.words.length} words! 🌟</div>
+    ${pb('Play Again! 🎮','ws-restart','',C.blue,'margin-top:20px')}
+  </div>`;
+  const wd=G.ws.words[G.ws.wi];
+  const col=G.ws.status==='correct'?C.green:G.ws.status==='wrong'?'#DC2626':C.blue;
+  const boxes=wd.w.split('').map((_,i)=>{const f=G.ws.typed[i];return`<div style="width:40px;height:48px;border-radius:12px;border:2.5px solid ${G.ws.status==='correct'?C.green:G.ws.status==='wrong'?'#DC2626':f?C.blue:'#BFDBFE'};background:${G.ws.status==='correct'?'#D1FAE5':G.ws.status==='wrong'?'#FEE2E2':f?'#EFF6FF':'white'};display:inline-flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:${col};margin:2px;transition:all .2s;transform:${G.ws.status==='correct'?'scale(1.1)':G.ws.status==='wrong'?'scale(.95)':'scale(1)'}">${f?.l||''}</div>`;}).join('');
+  const ltrs=G.ws.letters.map((lt,i)=>`<button style="width:44px;height:52px;border-radius:14px;border:2.5px solid ${lt.used?'#E5E7EB':C.blue};background:${lt.used?'#F3F4F6':'white'};font-size:19px;font-weight:800;color:${lt.used?'#9CA3AF':C.blue};margin:3px;transition:all .15s" data-a="ws-ltr" data-v="${i}">${lt.l}</button>`).join('');
+  return`<div>
+    ${bb(C.blue,'go','home')}
+    <div style="text-align:center;margin-bottom:6px">
+      <div style="font-size:20px;font-weight:800;color:${C.maroon}">🔤 Word Scramble!</div>
+      <div style="font-size:12px;color:#374151">Word ${G.ws.wi+1}/${G.ws.words.length} · Score: ${G.ws.score} ⭐</div>
+    </div>
+    ${prog(G.ws.wi,G.ws.words.length,C.blue)}
+    <div style="background:white;border-radius:20px;padding:16px 14px;border:2.5px solid ${C.blue};box-shadow:0 4px 14px ${C.blue}22;text-align:center;margin-bottom:18px">
+      <div style="font-size:38px;margin-bottom:6px">${wd.e}</div>
+      <div style="font-size:15px;font-weight:800;color:#1F2937">${wd.h}</div>
+    </div>
+    <div style="text-align:center;margin-bottom:12px">${boxes}</div>
+    ${G.ws.status==='correct'?`<div style="text-align:center;font-size:20px;font-weight:800;color:${C.green};margin-bottom:10px">🎉 Correct!</div>`:''}
+    ${G.ws.status==='wrong'?`<div style="text-align:center;font-size:16px;font-weight:800;color:#DC2626;margin-bottom:10px">❌ Wrong order! Try again!</div>`:''}
+    <div style="text-align:center;margin-bottom:12px;flex-wrap:wrap;display:flex;justify-content:center">${ltrs}</div>
+    <div style="text-align:center">
+      <button style="background:#FEE2E2;border:2px solid #DC2626;border-radius:14px;padding:10px 22px;font-size:14px;font-weight:800;color:#DC2626;font-family:'Baloo 2',sans-serif" data-a="ws-del">⌫ Delete</button>
+    </div>
+  </div>`;
+}
+
+function tlHTML(){
+  if(G.tl.done)return`<div style="text-align:center;padding:20px">
+    ${bb(C.orange,'go','home')}
+    <div style="font-size:60px;margin-top:16px">🏆</div>
+    <div style="font-size:22px;font-weight:800;color:${C.maroon};margin-top:8px">Timeline Master!</div>
+    <div style="font-size:16px;color:#B45309;margin-top:6px">${G.tl.score}/${TIMELINES.length} stories correct! 🌟</div>
+    ${pb('Play Again! 🎮','tl-restart','',C.orange,'margin-top:20px')}
+  </div>`;
+  const tl=TIMELINES[G.tl.ti];
+  const remaining=G.tl.events.filter(e=>!G.tl.placed.find(p=>p.o===e.o));
+  const next=G.tl.placed.length+1;
+  return`<div>
+    ${bb(C.orange,'go','home')}
+    <div style="text-align:center;margin-bottom:10px">
+      <div style="font-size:20px;font-weight:800;color:${C.maroon}">📋 Put in Order!</div>
+      <div style="font-size:12px;color:#374151">${tl.emoji} ${tl.title} · Story ${G.tl.ti+1}/${TIMELINES.length}</div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:#6B7280;margin-bottom:6px">✅ Placed correctly:</div>
+      ${G.tl.placed.map((ev,i)=>`<div style="background:#D1FAE5;border:2px solid ${C.green};border-radius:14px;padding:10px 14px;margin-bottom:6px;font-size:13px;font-weight:700;color:#065F46;display:flex;align-items:center;gap:10px"><span style="background:${C.green};color:white;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">${i+1}</span>${ev.t}</div>`).join('')}
+      ${G.tl.placed.length===tl.events.length?`<div style="text-align:center;font-size:18px;font-weight:800;color:${C.green};margin-top:8px">🎉 Perfect order!</div>`:''}
+    </div>
+    ${remaining.length>0?`<div>
+      <div style="font-size:12px;font-weight:700;color:#6B7280;margin-bottom:6px">👆 Tap event #${next} next:</div>
+      ${remaining.map(ev=>`<button style="background:white;border:2.5px solid ${tl.col};border-radius:14px;padding:12px 14px;margin-bottom:8px;font-size:13px;font-weight:700;color:#1F2937;font-family:'Baloo 2',sans-serif;width:100%;text-align:left;transition:all .2s" data-a="tl-tap" data-v="${ev.o}">${ev.t}</button>`).join('')}
+    </div>`:''}
+  </div>`;
+}
+
+function qzHTML(){
+  if(G.qz.done)return`<div style="text-align:center;padding:20px">
+    ${bb(C.purple,'go','home')}
+    <div style="font-size:60px;margin-top:16px">${G.qz.score>=7?'🏆':G.qz.score>=4?'⭐':'📚'}</div>
+    <div style="font-size:22px;font-weight:800;color:${C.maroon};margin-top:8px">${G.qz.score>=7?'Dharma Scholar!':G.qz.score>=4?'Great knowledge!':'Keep studying!'}</div>
+    <div style="font-size:16px;color:#B45309;margin-top:6px">${G.qz.score}/${G.qz.pool.length} correct! 🌟</div>
+    <div style="font-size:20px;margin:8px 0">${stars(G.qz.score,G.qz.pool.length)}</div>
+    ${pb('Play Again! 🎮','qz-restart','',C.purple,'margin-top:10px')}
+  </div>`;
+  const q=G.qz.pool[G.qz.qi];
+  const opts=shuf(q.o.map((o,i)=>({o,i}))).map(({o,i})=>{
+    let bg='white',bc='#E5E7EB',col='#1E293B';
+    if(G.qz.picked!==null){if(i===q.ok){bg='#EFF6FF';bc=C.blue;col=C.blue;}else if(G.qz.picked===i){bg='#FEF2F2';bc='#EF4444';col='#DC2626';}}
+    return`<button class="opt-btn" style="background:${bg};border-color:${bc};color:${col}" data-a="qz-pick" data-v="${i}">
+      <span style="opacity:.4;margin-right:8px;font-size:11px">${G.qz.picked!==null?(i===q.ok?'✅':G.qz.picked===i?'❌':'○'):'•'}</span>${o}
+    </button>`;
+  }).join('');
+  return`<div>
+    ${bb(C.purple,'go','home')}
+    <div style="text-align:center;margin-bottom:6px">
+      <div style="font-size:20px;font-weight:800;color:${C.maroon}">🧠 Deep Quiz!</div>
+      <div style="font-size:12px;color:#374151">Q ${G.qz.qi+1}/${G.qz.pool.length} · Score ${G.qz.score} ⭐</div>
+    </div>
+    ${prog(G.qz.qi,G.qz.pool.length,C.purple)}
+    <div style="background:white;border-radius:18px;padding:18px 14px;border:1.5px solid #E2E8F0;box-shadow:0 4px 14px rgba(0,0,0,.06);text-align:center;margin-bottom:16px">
+      <div style="font-size:17px;font-weight:800;color:#1F2937;line-height:1.4">${q.q}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">${opts}</div>
+    ${G.qz.picked!==null?`<div style="background:${G.qz.picked===q.ok?'#ECFDF5':'#FFF7ED'};border:1.5px solid ${G.qz.picked===q.ok?C.green:C.gold};border-radius:14px;padding:12px 14px;text-align:center;margin-bottom:12px">
+      <div style="font-size:16px">${G.qz.picked===q.ok?'🎉':'💡'}</div>
+      <div style="font-size:13px;color:#374151;font-weight:700;margin-top:4px">${q.f}</div>
+    </div>
+    ${pb(G.qz.qi>=G.qz.pool.length-1?'See Results! 🏆':'Next Question →','qz-next','',C.purple,'width:100%')}`:''
+    }
+  </div>`;
+}
+
+function pmHTML(){
+  if(G.pm.done)return`<div style="text-align:center;padding:20px">
+    ${bb(C.teal,'go','home')}
+    <div style="font-size:60px;margin-top:16px">🏆</div>
+    <div style="font-size:22px;font-weight:800;color:${C.maroon};margin-top:8px">Pair Master!</div>
+    <div style="font-size:16px;color:#B45309;margin-top:6px">${G.pm.score}/${PAIRS_SETS.length} sets complete! 🌟</div>
+    ${pb('Play Again! 🎮','pm-restart','',C.teal,'margin-top:20px')}
+  </div>`;
+  const ps=PAIRS_SETS[G.pm.pi];
+  const leftCols=ps.pairs.map((pair,i)=>{
+    const done=G.pm.matched.includes(pair.l.t);const sel=G.pm.lsel===pair.l.t;
+    return`<button style="background:${done?'#D1FAE5':sel?'#CFFAFE':'white'};border:2.5px solid ${done?C.green:sel?C.teal:'#E5E7EB'};border-radius:14px;padding:10px 8px;margin-bottom:8px;width:100%;font-family:'Baloo 2',sans-serif;cursor:${done?'default':'pointer'};transition:all .2s" data-a="pm-l" data-v="${pair.l.t}">
+      <div style="font-size:24px">${pair.l.e}</div>
+      <div style="font-size:11px;font-weight:700;color:#374151">${pair.l.t}</div>
+      ${done?'<div style="font-size:10px;color:'+C.green+'">✅</div>':''}
+    </button>`;}).join('');
+  const rightCols=G.pm.shuffledR.map(r=>{
+    const isDone=ps.pairs.find(p=>p.r.t===r.t&&G.pm.matched.includes(p.l.t));
+    return`<button style="background:${isDone?'#D1FAE5':'white'};border:2.5px solid ${isDone?C.green:'#E5E7EB'};border-radius:14px;padding:10px 8px;margin-bottom:8px;width:100%;font-family:'Baloo 2',sans-serif;cursor:${isDone?'default':'pointer'};transition:all .2s" data-a="pm-r" data-v="${r.t}">
+      <div style="font-size:24px">${r.e}</div>
+      <div style="font-size:11px;font-weight:700;color:#374151">${r.t}</div>
+      ${isDone?'<div style="font-size:10px;color:'+C.green+'">✅</div>':''}
+    </button>`;}).join('');
+  return`<div>
+    ${bb(C.teal,'go','home')}
+    <div style="text-align:center;margin-bottom:10px">
+      <div style="font-size:20px;font-weight:800;color:${C.maroon}">🔗 Match the Pairs!</div>
+      <div style="font-size:12px;color:#374151">${ps.title}</div>
+    </div>
+    ${G.pm.lsel?`<div style="text-align:center;font-size:13px;color:${C.teal};font-weight:700;margin-bottom:8px">Now tap the match for: ${ps.pairs.find(p=>p.l.t===G.pm.lsel)?.l.e} ${G.pm.lsel}</div>`:''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:400px;margin:0 auto">
+      <div><div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:8px;text-align:center">GOD / GODDESS</div>${leftCols}</div>
+      <div><div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:8px;text-align:center">MATCH WITH</div>${rightCols}</div>
+    </div>
+  </div>`;
+}
+
+/* ── Render ── */
+function render(){
+  const map={home:homeHTML,ws:wsHTML,tl:tlHTML,qz:qzHTML,pm:pmHTML};
+  H((map[G.screen]||homeHTML)());
+}
+
+/* ── Events ── */
+APP.addEventListener('click',e=>{
+  const el=e.target.closest('[data-a]');if(!el)return;
+  const a=el.dataset.a,v=el.dataset.v;
+  switch(a){
+    case'go': G.screen=v;
+      if(v==='ws')initWS();else if(v==='tl')initTL();
+      else if(v==='qz')initQZ();else if(v==='pm')initPM();break;
+    case'ws-ltr': wsTapLetter(parseInt(v));return;
+    case'ws-del': wsDelete();return;
+    case'ws-restart': initWS();break;
+    case'tl-tap':
+      const ord=parseInt(v);const tl=TIMELINES[G.tl.ti];const next=G.tl.placed.length+1;
+      const ev=G.tl.events.find(e=>e.o===ord);
+      if(ev&&ord===next){
+        G.tl.placed.push(ev);
+        if(G.tl.placed.length===tl.events.length){G.tl.score++;setTimeout(()=>{if(G.tl.ti>=TIMELINES.length-1){G.tl.done=true;}else{G.tl.ti++;setupTL();}render();},1400);}
+      }break;
+    case'tl-restart': initTL();break;
+    case'qz-pick':
+      if(G.qz.picked!==null)return;
+      G.qz.picked=parseInt(v);if(parseInt(v)===G.qz.pool[G.qz.qi].ok)G.qz.score++;break;
+    case'qz-next':
+      if(G.qz.qi>=G.qz.pool.length-1){G.qz.done=true;}else{G.qz.qi++;G.qz.picked=null;}break;
+    case'qz-restart': initQZ();break;
+    case'pm-l':
+      if(G.pm.matched.includes(v))return;G.pm.lsel=G.pm.lsel===v?null:v;break;
+    case'pm-r':
+      if(!G.pm.lsel)return;const ps=PAIRS_SETS[G.pm.pi];
+      const correct=ps.pairs.find(p=>p.l.t===G.pm.lsel);
+      if(correct&&correct.r.t===v){
+        G.pm.matched.push(G.pm.lsel);G.pm.lsel=null;
+        if(G.pm.matched.length===ps.pairs.length){G.pm.score++;
+          setTimeout(()=>{if(G.pm.pi>=PAIRS_SETS.length-1){G.pm.done=true;}else{G.pm.pi++;setupPM();}render();},1200);
+        }
+      }else{G.pm.lsel=null;}break;
+    case'pm-restart': initPM();break;
+  }
+  render();
+});
+
+initWS();initTL();initQZ();initPM();render();
+</script>
+</body></html>

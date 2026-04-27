@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Dharma Scholar 🕉️ (Ages 11–15)</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Baloo 2','Trebuchet MS',sans-serif;background:linear-gradient(135deg,#F8FAFC 0%,#F1F5F9 50%,#F8FAFC 100%);min-height:100vh}
+#app{max-width:430px;margin:0 auto;padding:14px;min-height:100vh}
+button{cursor:pointer;touch-action:manipulation;font-family:'Baloo 2',sans-serif}
+button:active{transform:scale(0.94)!important}
+.bb{background:white;font-weight:800;border-radius:12px;padding:8px 18px;font-size:14px;margin-bottom:14px;display:block;border-width:1.5px;border-style:solid;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.tile{border-radius:20px;padding:22px 8px;border-width:2px;border-style:solid;transition:transform .12s;font-family:'Baloo 2',sans-serif}
+.tile:active{transform:scale(0.92)!important}
+.opt{border-radius:14px;padding:14px 16px;font-family:'Baloo 2',sans-serif;font-weight:600;font-size:13px;text-align:left;width:100%;transition:all .2s;border-width:1.5px;border-style:solid;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const APP=document.getElementById('app');const H=s=>APP.innerHTML=s;
+
+const C={purple:'#7C3AED',teal:'#0D9488',gold:'#D97706',blue:'#1D4ED8',green:'#059669',maroon:'#991B1B',pink:'#BE185D',slate:'#334155'};
+
+/* ── Data ── */
+const SCENARIOS=[
+  {sc:'You worked hard all year but did not get the prize you expected. Your friend who worked less got it. You feel angry and cheated.',
+   q:'Which Gita teaching applies here?',
+   opts:[{t:'Nishkama Karma — do your duty without being attached to results',ok:true},{t:'Run away from all competitions',ok:false},{t:'Feel angry and stop working hard',ok:false},{t:'Blame others for your failure',ok:false}],
+   gita:'Chapter 2, Verse 47: "You have a right to perform your duties, but not to the fruits of your actions."',
+   lesson:'This is one of the most powerful teachings — work hard, but don\'t let results define your worth!'},
+  {sc:'Your best friend is wrong about something and you know it. Speaking up might upset them and damage your friendship.',
+   q:'What does Dharma say you should do?',
+   opts:[{t:'Speak the truth with kindness — Satya (truth) is sacred',ok:true},{t:'Stay silent to protect the friendship at all costs',ok:false},{t:'Tell other people but not your friend',ok:false},{t:'Pretend to agree completely',ok:false}],
+   gita:'Dharma principle: "Satyam Vada" — Always speak the truth with love and compassion.',
+   lesson:'True friendship can handle honest truth. Lying to protect feelings is actually a form of disrespect!'},
+  {sc:'You see someone being bullied at school. You want to help but you are afraid of getting involved yourself.',
+   q:'What does the Bhagavad Gita teach about facing fear?',
+   opts:[{t:'Stand up against injustice — do your duty even when afraid',ok:true},{t:'Only help if it benefits you personally',ok:false},{t:'Walk away — it is not your problem',ok:false},{t:'Wait and see if someone else helps first',ok:false}],
+   gita:'Chapter 2, Verse 3: "Do not yield to weakness, O Arjuna — arise with courage!"',
+   lesson:'Arjuna was afraid too! Krishna taught that courage is doing the right thing even when you\'re scared.'},
+  {sc:'You made a big mistake that hurt someone. You feel extremely guilty and keep punishing yourself mentally.',
+   q:'What is the healthy spiritual approach according to the Gita?',
+   opts:[{t:'Acknowledge it, apologize, learn, and move forward — endless guilt helps no one',ok:true},{t:'Keep feeling guilty forever as self-punishment',ok:false},{t:'Pretend the mistake never happened',ok:false},{t:'Blame the circumstances instead of yourself',ok:false}],
+   gita:'Chapter 18, Verse 66: "Surrender to Me. I shall deliver you from all sinful reactions. Do not fear."',
+   lesson:'The Gita teaches self-forgiveness and renewal, not endless self-punishment. Learn, grow, and move forward!'},
+  {sc:'You are great at cricket and your friend is not. He feels bad watching you play well. You wonder if you should hide your talent.',
+   q:'Is hiding your talent the right Dharmic action?',
+   opts:[{t:'No — excellence is a gift from God. Help your friend improve instead',ok:true},{t:'Yes — always hide abilities to avoid hurting others',ok:false},{t:'Stop playing cricket entirely',ok:false},{t:'Show off even more to motivate him',ok:false}],
+   gita:'Chapter 3, Verse 21: "Whatever a great person does, ordinary people follow their example."',
+   lesson:'Your excellence can inspire others. Hiding it helps no one. Instead, teach, mentor, and lift others with you!'},
+];
+const WHO=[
+  {q:'"I am the beginning and the end of all creation."',sp:'Lord Krishna',oth:['Rama','Shiva','Brahma'],src:'Bhagavad Gita 10:20'},
+  {q:'"Whenever righteousness declines and evil rises, I manifest myself to restore dharma."',sp:'Lord Krishna',oth:['Vishnu','Rama','Arjuna'],src:'Bhagavad Gita 4:7–8'},
+  {q:'"I am the son of the Wind God. Nothing is impossible for me!"',sp:'Hanuman',oth:['Bhima','Garuda','Arjuna'],src:'Ramayana'},
+  {q:'"Even if I am killed, I will not fight on the side of adharma."',sp:'Karna',oth:['Arjuna','Bhishma','Drona'],src:'Mahabharata'},
+  {q:'"Where there is dharma, there is victory."',sp:'Vyasa',oth:['Krishna','Arjuna','Bhishma'],src:'Mahabharata 6:43:60'},
+  {q:'"Death is certain for the born. Birth is certain for the dead."',sp:'Lord Krishna',oth:['Arjuna','Yama','Brahma'],src:'Bhagavad Gita 2:27'},
+  {q:'"My parents are my world. I need go no further."',sp:'Ganesha',oth:['Kartikeya','Hanuman','Rama'],src:'Shiva Purana'},
+  {q:'"I am not the body, nor the senses, nor the mind. I am the eternal Atman."',sp:'Adi Shankaracharya',oth:['Arjuna','Vyasa','Narada'],src:'Vivekachudamani'},
+];
+const SANSKRIT=[
+  {w:'Dharma',m:'Righteous duty and moral order',h:'Your sacred responsibility 📜',e:'🕉️'},
+  {w:'Karma',m:'Actions and their consequences',h:'What you do comes back to you ⚡',e:'⚡'},
+  {w:'Moksha',m:'Liberation from the cycle of rebirth',h:'The ultimate spiritual goal 🌟',e:'🌟'},
+  {w:'Ahimsa',m:'Non-violence in thought, word, and deed',h:'The greatest ethical principle ☮️',e:'☮️'},
+  {w:'Artha',m:'Material prosperity and wealth',h:'One of the four goals of life 💰',e:'💰'},
+  {w:'Samsara',m:'The endless cycle of birth, death, and rebirth',h:'The wheel we seek to escape 🔄',e:'🔄'},
+  {w:'Atman',m:'The individual eternal soul within each person',h:'Your true eternal self 🪔',e:'🪔'},
+  {w:'Brahman',m:'The universal cosmic consciousness',h:'The ultimate reality of all existence 🌌',e:'🌌'},
+  {w:'Yoga',m:'Union of the individual self with the divine',h:'Much more than just exercise! 🧘',e:'🧘'},
+  {w:'Satya',m:'Truth in all its forms',h:'Fundamental pillar of Dharma ✨',e:'✨'},
+  {w:'Tapas',m:'Spiritual discipline and austerity',h:'Burning away impurities through effort 🔥',e:'🔥'},
+  {w:'Guru',m:'One who dispels darkness with the light of knowledge',h:'Teacher of wisdom 🎓',e:'🎓'},
+  {w:'Prana',m:'Life force energy in all living beings',h:'The very breath of life 💨',e:'💨'},
+  {w:'Bhakti',m:'Devotion and loving surrender to the divine',h:'The yoga of pure love 💝',e:'💝'},
+  {w:'Jnana',m:'Spiritual wisdom and self-knowledge',h:'The yoga of knowledge 📚',e:'📚'},
+];
+const DEEP=[
+  {q:'What is the core teaching of the Bhagavad Gita?',o:['Do your duty without attachment to results','Always win at any cost','Avoid all action to avoid sin','Worship only one specific deity'],ok:0,f:'Nishkama Karma — selfless, detached action is the Gita\'s central teaching.'},
+  {q:'How many Pandava brothers were there?',o:['5','3','7','4'],ok:0,f:'Yudhishthira, Bhima, Arjuna, Nakula, and Sahadeva — sons of Kunti and Madri.'},
+  {q:"Which chapter of the Gita shows Krishna's Universal Form?",o:['Chapter 11','Chapter 2','Chapter 18','Chapter 7'],ok:0,f:'Chapter 11 — Vishwarupa Darshana — where Arjuna sees the infinite cosmic form!'},
+  {q:'Karna was actually the son of which deity?',o:['Surya (Sun God)','Indra','Varuna','Yama'],ok:0,f:'Karna was born to Kunti from the Sun God — making him the eldest Pandava by birth!'},
+  {q:'What does "Upanishad" literally mean?',o:['Sitting near a teacher to receive wisdom','Going to the temple regularly','Performing sacred rituals','Reading scriptures alone'],ok:0,f:'"Upa" (near) + "ni" (below) + "shad" (sit) — sitting at the guru\'s feet to receive knowledge.'},
+  {q:'The Rigveda has approximately how many hymns?',o:['1,028','500','2,000','108'],ok:0,f:'The Rigveda has 1,028 hymns organized in 10 mandalas (books)!'},
+  {q:'What are the four Purusharthas (life goals)?',o:['Dharma, Artha, Kama, Moksha','Karma, Yoga, Bhakti, Jnana','Satya, Ahimsa, Tapas, Brahmacharya','Veda, Upanishad, Purana, Gita'],ok:0,f:'The four goals: Dharma (duty), Artha (prosperity), Kama (desire), and Moksha (liberation)!'},
+  {q:'Who is called Pitamaha — grandfather — by both Pandavas and Kauravas?',o:['Bhishma','Drona','Dhritarashtra','Vyasa'],ok:0,f:'Bhishma (born Devavrata) was the grand-uncle revered as grandfather by both sides.'},
+  {q:'Which animal is sacred to Lord Shiva?',o:['Nandi the Bull','Elephant','Tiger','Peacock'],ok:0,f:'Nandi the white bull is Shiva\'s vehicle and guardian of Mount Kailash!'},
+  {q:'What is Brahmacharya?',o:['Celibacy and channeling energy toward spiritual growth','Daily temple prayer','Strict fasting practices','A type of meditation'],ok:0,f:'Brahmacharya means directing vital energy toward spiritual practice and self-discipline.'},
+];
+
+/* ── Helpers ── */
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const stars=(n,t)=>Array.from({length:t},(_,i)=>`<span style="opacity:${i<n?1:.15}">⭐</span>`).join('');
+const bb=(col,a,v='')=>`<button class="bb" style="border-color:${col}22;color:${C.slate}" data-a="${a}" data-v="${v}">← Home</button>`;
+const pb=(lbl,a,v,bg,ex='')=>`<button style="background:${bg};color:white;border:none;border-radius:14px;padding:12px 22px;font-size:15px;font-weight:800;font-family:'Baloo 2',sans-serif;${ex}" data-a="${a}" data-v="${v}">${lbl}</button>`;
+const badge=(t,col)=>`<span style="background:${col}18;color:${col};border:1.5px solid ${col}44;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:800;letter-spacing:.5px">${t}</span>`;
+const prog=(n,t,col)=>`<div style="height:6px;background:#E2E8F0;border-radius:99px;margin-bottom:14px;overflow:hidden"><div style="height:100%;background:${col};border-radius:99px;width:${Math.round(n/t*100)}%;transition:width .4s"></div></div>`;
+
+/* ── State ── */
+const G={screen:'home',
+  gi:{pool:[],si:0,picked:null,score:0,done:false,opts:[]},
+  ws:{pool:[],qi:0,picked:null,score:0,done:false,opts:[]},
+  sk:{pool:[],si:0,picked:null,score:0,done:false,opts:[]},
+  dk:{pool:[],qi:0,picked:null,score:0,done:false}
+};
+
+/* ── Init ── */
+function initGI(){G.gi.pool=shuf([...SCENARIOS]);G.gi.si=0;G.gi.picked=null;G.gi.score=0;G.gi.done=false;G.gi.opts=G.gi.pool.map(s=>shuf([...s.opts]));}
+function initWS(){G.ws.pool=shuf([...WHO]);G.ws.qi=0;G.ws.picked=null;G.ws.score=0;G.ws.done=false;G.ws.opts=G.ws.pool.map(q=>shuf([q.sp,...q.oth]));}
+function initSK(){G.sk.pool=shuf([...SANSKRIT]);G.sk.si=0;G.sk.picked=null;G.sk.score=0;G.sk.done=false;buildSKOpts();}
+function buildSKOpts(){G.sk.opts=G.sk.pool.map((w,i)=>{const wrongs=shuf(G.sk.pool.filter((_,j)=>j!==i).map(x=>x.m)).slice(0,3);return shuf([w.m,...wrongs]);});}
+function initDK(){G.dk.pool=shuf([...DEEP]).slice(0,8);G.dk.qi=0;G.dk.picked=null;G.dk.score=0;G.dk.done=false;}
+
+/* ── Screens ── */
+function homeHTML(){
+  const tiles=[
+    {id:'gi',e:'📖',t:'Gita Wisdom',     s:'Apply the Gita to real life',col:C.purple,bg:'#FAF5FF'},
+    {id:'ws',e:'🗣️',t:'Who Said It?',    s:'Identify epic speakers',     col:C.teal,  bg:'#F0FDFA'},
+    {id:'sk',e:'🕉️',t:'Sanskrit Decoder',s:'Learn ancient vocabulary',   col:C.gold,  bg:'#FEFCE8'},
+    {id:'dk',e:'🎯',t:'Deep Knowledge',   s:'Vedas, epics & philosophy',  col:C.blue,  bg:'#EFF6FF'},
+  ];
+  return`<div style="padding:20px 4px;text-align:center">
+    <div style="font-size:12px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:3px;margin-bottom:6px">Ages 11–15</div>
+    <div style="font-size:44px;margin:0 0 6px">🕉️</div>
+    <h1 style="margin:0;font-size:26px;font-weight:800;color:${C.maroon};letter-spacing:-1px">Dharma Scholar</h1>
+    <p style="margin:5px 0 22px;color:#64748B;font-size:13px;font-weight:600">Philosophy · Epics · Sanskrit · Wisdom</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:400px;margin:0 auto">
+      ${tiles.map(g=>`<button class="tile" style="background:${g.bg};border-color:${g.col}44;box-shadow:0 3px 12px ${g.col}18" data-a="go" data-v="${g.id}">
+        <div style="font-size:32px;margin-bottom:8px">${g.e}</div>
+        <div style="font-size:14px;font-weight:800;color:${g.col}">${g.t}</div>
+        <div style="font-size:11px;color:#94A3B8;margin-top:3px;line-height:1.3">${g.s}</div>
+      </button>`).join('')}
+    </div>
+    <div style="margin-top:22px;color:#94A3B8;font-size:12px">Explore the depth of Sanatan Dharma 🕉️</div>
+  </div>`;
+}
+
+function giHTML(){
+  if(G.gi.done)return`<div style="text-align:center;padding:20px">
+    ${bb(C.purple,'go','home')}
+    <div style="font-size:54px;margin-top:16px">${G.gi.score>=4?'🏆':G.gi.score>=2?'⭐':'📚'}</div>
+    <div style="font-size:20px;font-weight:800;color:${C.maroon};margin-top:8px">${G.gi.score>=4?'Gita Scholar!':G.gi.score>=2?'Good thinking!':'Keep reflecting!'}</div>
+    <div style="font-size:15px;color:#B45309;margin-top:4px">${G.gi.score}/${G.gi.pool.length} correct 🌟</div>
+    <p style="color:#475569;font-size:13px;margin:12px auto;line-height:1.6;max-width:300px">The Gita's wisdom applies to every moment in life. Keep reading and reflecting!</p>
+    ${pb('Play Again! 🎮','gi-restart','',C.purple,'margin-top:12px')}
+  </div>`;
+  const sc=G.gi.pool[G.gi.si];
+  const opts=G.gi.opts[G.gi.si].map((opt,i)=>{
+    const isPk=G.gi.picked===i;
+    let bg='white',bc='#E2E8F0',col='#1E293B';
+    if(G.gi.picked!==null){if(opt.ok){bg='#F0FDF4';bc=C.green;col=C.green;}else if(isPk&&!opt.ok){bg='#FEF2F2';bc='#EF4444';col='#DC2626';}}
+    return`<button class="opt" style="background:${bg};border-color:${bc};color:${col}" data-a="gi-pick" data-v="${i}">
+      <span style="opacity:.35;margin-right:8px">${G.gi.picked!==null?(opt.ok?'✅':isPk?'❌':'○'):'•'}</span>${opt.t}
+    </button>`;}).join('');
+  return`<div>
+    ${bb(C.purple,'go','home')}
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      ${badge('Gita Wisdom',C.purple)}
+      <span style="font-size:12px;color:#64748B">Scenario ${G.gi.si+1}/${G.gi.pool.length}</span>
+      <span style="font-size:12px;color:${C.gold};margin-left:auto">Score: ${G.gi.score} ⭐</span>
+    </div>
+    <div style="background:white;border-radius:18px;padding:18px 16px;border:1.5px solid #E2E8F0;box-shadow:0 4px 16px rgba(0,0,0,.05);margin-bottom:12px">
+      <div style="font-size:11px;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Life Situation</div>
+      <div style="font-size:14px;color:#1E293B;line-height:1.7;font-weight:600">${sc.sc}</div>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:${C.purple};margin-bottom:10px">${sc.q}</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">${opts}</div>
+    ${G.gi.picked!==null?`<div style="background:${C.purple}08;border:1.5px solid ${C.purple}33;border-radius:14px;padding:14px 16px;margin-bottom:12px">
+      <div style="font-size:12px;font-weight:800;color:${C.purple};margin-bottom:6px">📖 Gita Reference</div>
+      <div style="font-size:13px;color:#374151;font-style:italic;margin-bottom:8px">"${sc.gita}"</div>
+      <div style="font-size:13px;color:#1E293B;font-weight:600;line-height:1.6">${sc.lesson}</div>
+    </div>
+    ${pb(G.gi.si>=G.gi.pool.length-1?'See Results 🏆':'Next Scenario →','gi-next','',C.purple,'width:100%')}`:''
+    }
+  </div>`;
+}
+
+function wsHTML(){
+  if(G.ws.done)return`<div style="text-align:center;padding:20px">
+    ${bb(C.teal,'go','home')}
+    <div style="font-size:54px;margin-top:16px">${G.ws.score>=6?'🏆':G.ws.score>=4?'⭐':'📚'}</div>
+    <div style="font-size:20px;font-weight:800;color:${C.maroon};margin-top:8px">${G.ws.score>=6?'Epic Scholar!':G.ws.score>=4?'Great recall!':'Study the epics more!'}</div>
+    <div style="font-size:15px;color:#B45309;margin-top:4px">${G.ws.score}/${G.ws.pool.length} correct 🌟</div>
+    <div style="font-size:20px;margin:8px 0">${stars(G.ws.score,G.ws.pool.length)}</div>
+    ${pb('Play Again! 🎮','ws-restart','',C.teal,'margin-top:16px')}
+  </div>`;
+  const q=G.ws.pool[G.ws.qi];
+  const opts=G.ws.opts[G.ws.qi].map(s=>{
+    const isOk=s===q.sp,isPk=G.ws.picked===s;
+    let bg='white',bc='#E2E8F0',col='#1E293B';
+    if(G.ws.picked!==null){if(isOk){bg='#F0FDFA';bc=C.teal;col=C.teal;}else if(isPk){bg='#FEF2F2';bc='#EF4444';col='#DC2626';}}
+    return`<button class="opt" style="background:${bg};border-color:${bc};color:${col};text-align:center;padding:16px 10px" data-a="ws-pick" data-v="${s}">
+      ${G.ws.picked!==null?(isOk?'✅ ':isPk?'❌ ':''):''}${s}
+    </button>`;}).join('');
+  return`<div>
+    ${bb(C.teal,'go','home')}
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      ${badge('Who Said It?',C.teal)}
+      <span style="font-size:12px;color:#64748B">Q ${G.ws.qi+1}/${G.ws.pool.length}</span>
+      <span style="font-size:12px;color:${C.gold};margin-left:auto">Score: ${G.ws.score} ⭐</span>
+    </div>
+    <div style="background:white;border-radius:18px;padding:22px 16px;border:1.5px solid #E2E8F0;box-shadow:0 4px 16px rgba(0,0,0,.05);margin-bottom:10px;text-align:center">
+      <div style="font-size:28px;color:#94A3B8;margin-bottom:10px">"</div>
+      <div style="font-size:16px;color:#1E293B;line-height:1.7;font-style:italic;font-weight:600">${q.q}</div>
+      <div style="font-size:28px;color:#94A3B8;margin-top:8px;margin-bottom:10px">"</div>
+      ${badge(q.src,'#64748B')}
+    </div>
+    <div style="font-size:13px;font-weight:700;color:${C.teal};margin-bottom:10px;text-align:center">Who spoke these words?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">${opts}</div>
+    ${G.ws.picked!==null?pb(G.ws.qi>=G.ws.pool.length-1?'See Results 🏆':'Next Quote →','ws-next','',C.teal,'width:100%'):''}
+  </div>`;
+}
+
+function skHTML(){
+  if(G.sk.done)return`<div style="text-align:center;padding:20px">
+    ${bb(C.gold,'go','home')}
+    <div style="font-size:54px;margin-top:16px">${G.sk.score>=12?'🏆':G.sk.score>=8?'⭐':'📚'}</div>
+    <div style="font-size:20px;font-weight:800;color:${C.maroon};margin-top:8px">${G.sk.score>=12?'Sanskrit Master!':G.sk.score>=8?'Great vocabulary!':'Keep learning!'}</div>
+    <div style="font-size:15px;color:#B45309;margin-top:4px">${G.sk.score}/${G.sk.pool.length} correct 🌟</div>
+    ${pb('Play Again! 🎮','sk-restart','',C.gold,'margin-top:16px')}
+  </div>`;
+  const w=G.sk.pool[G.sk.si];
+  const opts=G.sk.opts[G.sk.si].map(m=>{
+    const isOk=m===w.m,isPk=G.sk.picked===m;
+    let bg='white',bc='#E2E8F0',col='#1E293B';
+    if(G.sk.picked!==null){if(isOk){bg='#FEFCE8';bc=C.gold;col=C.gold;}else if(isPk){bg='#FEF2F2';bc='#EF4444';col='#DC2626';}}
+    return`<button class="opt" style="background:${bg};border-color:${bc};color:${col}" data-a="sk-pick" data-v="${m.replaceAll('"','&quot;')}">
+      <span style="opacity:.35;margin-right:8px">${G.sk.picked!==null?(isOk?'✅':isPk?'❌':'○'):'•'}</span>${m}
+    </button>`;}).join('');
+  return`<div>
+    ${bb(C.gold,'go','home')}
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      ${badge('Sanskrit Decoder',C.gold)}
+      <span style="font-size:12px;color:#64748B">${G.sk.si+1}/${G.sk.pool.length}</span>
+      <span style="font-size:12px;color:${C.gold};margin-left:auto">Score: ${G.sk.score} ⭐</span>
+    </div>
+    ${prog(G.sk.si,G.sk.pool.length,C.gold)}
+    <div style="background:white;border-radius:18px;padding:28px 20px;border:1.5px solid #E2E8F0;box-shadow:0 4px 16px rgba(0,0,0,.05);margin-bottom:14px;text-align:center">
+      <div style="font-size:38px;margin-bottom:8px">${w.e}</div>
+      <div style="font-size:30px;font-weight:800;color:${C.maroon};letter-spacing:1px">${w.w}</div>
+      <div style="font-size:13px;color:#94A3B8;margin-top:6px">${w.h}</div>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:${C.gold};margin-bottom:10px;text-align:center">What does this Sanskrit word mean?</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">${opts}</div>
+    ${G.sk.picked!==null?pb(G.sk.si>=G.sk.pool.length-1?'See Results 🏆':'Next Word →','sk-next','',C.gold,'width:100%'):''}
+  </div>`;
+}
+
+function dkHTML(){
+  if(G.dk.done)return`<div style="text-align:center;padding:20px">
+    ${bb(C.blue,'go','home')}
+    <div style="font-size:54px;margin-top:16px">${G.dk.score>=7?'🏆':G.dk.score>=4?'⭐':'📚'}</div>
+    <div style="font-size:20px;font-weight:800;color:${C.maroon};margin-top:8px">${G.dk.score>=7?'Dharma Scholar!':G.dk.score>=4?'Good knowledge!':'Study more scriptures!'}</div>
+    <div style="font-size:15px;color:#B45309;margin-top:4px">${G.dk.score}/${G.dk.pool.length} correct 🌟</div>
+    ${pb('Play Again! 🎮','dk-restart','',C.blue,'margin-top:16px')}
+  </div>`;
+  const q=G.dk.pool[G.dk.qi];
+  const opts=shuf(q.o.map((o,i)=>({o,i}))).map(({o,i})=>{
+    const isOk=i===q.ok,isPk=G.dk.picked===i;
+    let bg='white',bc='#E2E8F0',col='#1E293B';
+    if(G.dk.picked!==null){if(isOk){bg='#EFF6FF';bc=C.blue;col=C.blue;}else if(isPk){bg='#FEF2F2';bc='#EF4444';col='#DC2626';}}
+    return`<button class="opt" style="background:${bg};border-color:${bc};color:${col}" data-a="dk-pick" data-v="${i}">
+      <span style="opacity:.35;margin-right:10px;font-size:11px;font-family:monospace">${G.dk.picked!==null?(isOk?'✅':isPk?'❌':'○'):String.fromCharCode(65+i)+'.'}</span>${o}
+    </button>`;}).join('');
+  return`<div>
+    ${bb(C.blue,'go','home')}
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      ${badge('Deep Knowledge',C.blue)}
+      <span style="font-size:12px;color:#64748B">Q ${G.dk.qi+1}/${G.dk.pool.length}</span>
+      <span style="font-size:12px;color:${C.gold};margin-left:auto">Score: ${G.dk.score} ⭐</span>
+    </div>
+    ${prog(G.dk.qi,G.dk.pool.length,C.blue)}
+    <div style="background:white;border-radius:18px;padding:18px 16px;border:1.5px solid #E2E8F0;box-shadow:0 4px 16px rgba(0,0,0,.05);margin-bottom:14px">
+      <div style="font-size:16px;font-weight:800;color:#1E293B;line-height:1.4">${q.q}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">${opts}</div>
+    ${G.dk.picked!==null?`<div style="background:#F8FAFC;border:1.5px solid #E2E8F0;border-radius:14px;padding:12px 16px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:800;color:#94A3B8;margin-bottom:4px">💡 DID YOU KNOW?</div>
+      <div style="font-size:13px;color:#374151;line-height:1.6;font-weight:600">${q.f}</div>
+    </div>
+    ${pb(G.dk.qi>=G.dk.pool.length-1?'See Results 🏆':'Next Question →','dk-next','',C.blue,'width:100%')}`:''
+    }
+  </div>`;
+}
+
+/* ── Render ── */
+function render(){
+  const map={home:homeHTML,gi:giHTML,ws:wsHTML,sk:skHTML,dk:dkHTML};
+  H((map[G.screen]||homeHTML)());
+}
+
+/* ── Events ── */
+APP.addEventListener('click',e=>{
+  const el=e.target.closest('[data-a]');if(!el)return;
+  const a=el.dataset.a,v=el.dataset.v;
+  switch(a){
+    case'go': G.screen=v;
+      if(v==='gi')initGI();else if(v==='ws')initWS();
+      else if(v==='sk')initSK();else if(v==='dk')initDK();break;
+    case'gi-pick':
+      if(G.gi.picked!==null)return;G.gi.picked=parseInt(v);
+      if(G.gi.opts[G.gi.si][parseInt(v)].ok)G.gi.score++;break;
+    case'gi-next':
+      if(G.gi.si>=G.gi.pool.length-1){G.gi.done=true;}else{G.gi.si++;G.gi.picked=null;}break;
+    case'gi-restart': initGI();break;
+    case'ws-pick':
+      if(G.ws.picked!==null)return;G.ws.picked=v;
+      if(v===G.ws.pool[G.ws.qi].sp)G.ws.score++;break;
+    case'ws-next':
+      if(G.ws.qi>=G.ws.pool.length-1){G.ws.done=true;}else{G.ws.qi++;G.ws.picked=null;}break;
+    case'ws-restart': initWS();break;
+    case'sk-pick':
+      if(G.sk.picked!==null)return;G.sk.picked=v;
+      if(v===G.sk.pool[G.sk.si].m)G.sk.score++;break;
+    case'sk-next':
+      if(G.sk.si>=G.sk.pool.length-1){G.sk.done=true;}else{G.sk.si++;G.sk.picked=null;}break;
+    case'sk-restart': initSK();break;
+    case'dk-pick':
+      if(G.dk.picked!==null)return;G.dk.picked=parseInt(v);
+      if(parseInt(v)===G.dk.pool[G.dk.qi].ok)G.dk.score++;break;
+    case'dk-next':
+      if(G.dk.qi>=G.dk.pool.length-1){G.dk.done=true;}else{G.dk.qi++;G.dk.picked=null;}break;
+    case'dk-restart': initDK();break;
+  }
+  render();
+});
+
+initGI();initWS();initSK();initDK();render();
+</script>
+</body></html>

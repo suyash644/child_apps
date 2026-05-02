@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dharma Seekho — Design System</title>
+<style>
+:root {
+  --saffron:#FF6B35; --saffron-l:#FFF5EE; --saffron-ll:#FEF3C7;
+  --maroon:#991B1B; --maroon-l:#FEE2E2;
+  --gold:#F59E0B; --gold-l:#FEF3C7;
+  --purple:#7C3AED; --purple-l:#EDE9FE;
+  --green:#059669; --green-l:#D1FAE5;
+  --teal:#0D9488; --teal-l:#CCFBF1;
+  --blue:#1D4ED8; --blue-l:#EFF6FF;
+  --txt:#1F2937; --txt2:#6B7280; --txt3:#9CA3AF;
+  --brd:#E5E7EB; --bg:#FFFBEB; --bg2:#F3F4F6;
+  --white:#FFFFFF;
+  --sp-4:4px; --sp-8:8px; --sp-12:12px; --sp-16:16px;
+  --sp-24:24px; --sp-32:32px; --sp-48:48px;
+  --r-sm:8px; --r-md:14px; --r-lg:20px; --r-pill:999px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F8F9FA;color:var(--txt);line-height:1.5}
+.sidebar{width:220px;background:#fff;border-right:1px solid var(--brd);height:100vh;overflow-y:auto;position:fixed;top:0;left:0;padding:24px 0}
+.logo{padding:0 20px 20px;border-bottom:1px solid var(--brd);margin-bottom:16px}
+.logo-title{font-size:16px;font-weight:700;color:var(--maroon)}
+.logo-sub{font-size:11px;color:var(--txt3);margin-top:2px}
+.nav-section{padding:0 12px;margin-bottom:8px}
+.nav-label{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;padding:0 8px;margin-bottom:4px}
+.nav-item{display:block;padding:7px 8px;border-radius:8px;font-size:13px;color:var(--txt2);text-decoration:none;cursor:pointer;transition:all .12s}
+.nav-item:hover,.nav-item.active{background:var(--saffron-l);color:var(--saffron)}
+.main{margin-left:220px;padding:40px;max-width:1100px}
+.page-title{font-size:28px;font-weight:700;color:var(--txt);margin-bottom:4px}
+.page-sub{font-size:14px;color:var(--txt2);margin-bottom:40px}
+.section{margin-bottom:48px}
+.section-title{font-size:18px;font-weight:700;color:var(--txt);margin-bottom:4px;padding-bottom:10px;border-bottom:2px solid var(--saffron);display:inline-block}
+.section-desc{font-size:13px;color:var(--txt2);margin:8px 0 20px}
+/* Color swatches */
+.color-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.swatch{border-radius:12px;overflow:hidden;border:1px solid var(--brd)}
+.swatch-color{height:64px}
+.swatch-info{padding:10px 12px;background:#fff}
+.swatch-name{font-size:12px;font-weight:600;color:var(--txt)}
+.swatch-hex{font-size:11px;color:var(--txt3);font-family:monospace;margin-top:2px}
+.swatch-usage{font-size:10px;color:var(--txt3);margin-top:3px}
+/* Typography */
+.type-row{border-bottom:1px solid var(--brd);padding:16px 0;display:flex;align-items:baseline;gap:24px}
+.type-meta{min-width:180px;font-size:11px;color:var(--txt3);font-family:monospace}
+/* Spacing */
+.space-grid{display:flex;flex-direction:column;gap:8px}
+.space-row{display:flex;align-items:center;gap:16px}
+.space-bar{height:16px;background:var(--saffron);border-radius:4px;opacity:.7}
+.space-label{font-size:12px;color:var(--txt2);font-family:monospace;min-width:60px}
+.space-usage{font-size:12px;color:var(--txt3)}
+/* Components */
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.comp-card{background:#fff;border:1px solid var(--brd);border-radius:14px;padding:20px}
+.comp-name{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:4px}
+.comp-spec{font-size:11px;color:var(--txt3);font-family:monospace;margin-bottom:12px}
+.comp-preview{background:var(--bg2);border-radius:10px;padding:16px;display:flex;align-items:center;justify-content:center;min-height:60px;gap:10px;flex-wrap:wrap}
+/* Buttons preview */
+.btn{display:inline-flex;align-items:center;justify-content:center;font-weight:700;border-radius:var(--r-md);cursor:default;font-family:inherit}
+.btn-primary{background:var(--saffron);color:#fff;padding:12px 24px;font-size:15px;border:none}
+.btn-secondary{background:#fff;color:var(--saffron);padding:11px 22px;font-size:14px;border:2px solid var(--saffron)}
+.btn-ghost{background:transparent;color:var(--txt2);padding:8px 18px;font-size:13px;border:1px solid var(--brd)}
+.btn-sm{background:var(--saffron-l);color:#92400E;padding:5px 12px;font-size:11px;border:none;border-radius:999px}
+/* Card preview */
+.preview-card{background:#fff;border:1px solid var(--brd);border-radius:14px;padding:14px;max-width:200px}
+/* Badge pill */
+.pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600}
+/* Elevation */
+.el-box{width:60px;height:60px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--txt2)}
+/* Icons */
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px}
+.icon-item{background:#fff;border:1px solid var(--brd);border-radius:10px;padding:12px;text-align:center}
+.icon-item .ico{font-size:22px;margin-bottom:6px}
+.icon-item .ico-lbl{font-size:9px;color:var(--txt3)}
+/* Motion */
+.motion-row{border-bottom:1px solid var(--brd);padding:12px 0;display:flex;align-items:center;gap:20px}
+.motion-name{font-size:13px;font-weight:600;min-width:180px}
+.motion-spec{font-size:12px;color:var(--txt3);font-family:monospace}
+/* Grid */
+.grid-demo{background:var(--bg2);border-radius:10px;padding:16px;display:flex;gap:4px}
+.grid-col{background:rgba(255,107,53,.15);border:1px solid rgba(255,107,53,.3);border-radius:4px;flex:1;height:40px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--bg2);padding:10px 12px;text-align:left;font-size:12px;font-weight:600;color:var(--txt2);border-bottom:1px solid var(--brd)}
+td{padding:10px 12px;border-bottom:1px solid var(--brd);color:var(--txt)}
+td code{background:var(--bg2);padding:1px 5px;border-radius:4px;font-size:11px;font-family:monospace}
+.tag{display:inline-block;background:var(--saffron-ll);color:#92400E;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;margin:2px}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="logo">
+    <div style="font-size:24px;margin-bottom:6px">🕉️</div>
+    <div class="logo-title">Dharma Seekho</div>
+    <div class="logo-sub">Design System v1.0</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Foundation</div>
+    <a class="nav-item active" href="#colors">Colors</a>
+    <a class="nav-item" href="#typography">Typography</a>
+    <a class="nav-item" href="#spacing">Spacing</a>
+    <a class="nav-item" href="#radius">Border Radius</a>
+    <a class="nav-item" href="#elevation">Elevation</a>
+    <a class="nav-item" href="#motion">Motion</a>
+    <a class="nav-item" href="#grid">Grid</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Components</div>
+    <a class="nav-item" href="#buttons">Buttons</a>
+    <a class="nav-item" href="#pills">Pills & Tags</a>
+    <a class="nav-item" href="#cards">Cards</a>
+    <a class="nav-item" href="#inputs">Inputs</a>
+    <a class="nav-item" href="#progress">Progress</a>
+    <a class="nav-item" href="#tabs">Tab Bar</a>
+    <a class="nav-item" href="#icons">Icons</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Patterns</div>
+    <a class="nav-item" href="#headers">Screen Headers</a>
+    <a class="nav-item" href="#states">States</a>
+    <a class="nav-item" href="#age-themes">Age Themes</a>
+  </div>
+</div>
+
+<div class="main">
+  <div class="page-title">Dharma Seekho Design System</div>
+  <div class="page-sub">Design tokens, components, and patterns for the Dharma Seekho mobile app · v1.0 · May 2025</div>
+
+  <!-- ── COLORS ── -->
+  <div class="section" id="colors">
+    <div class="section-title">Colors</div>
+    <div class="section-desc">All colors derive from the saffron + maroon palette of Sanatan Dharma. Age groups have distinct accent colors: saffron (3–6), royal blue (7–11), deep purple (11–15).</div>
+    <div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:10px">Primary palette</div>
+    <div class="color-grid" style="margin-bottom:20px">
+      <div class="swatch"><div class="swatch-color" style="background:#FF6B35"></div><div class="swatch-info"><div class="swatch-name">Saffron</div><div class="swatch-hex">#FF6B35</div><div class="swatch-usage">Primary · CTAs · Focus · Age 3–6 accent</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#991B1B"></div><div class="swatch-info"><div class="swatch-name">Maroon</div><div class="swatch-hex">#991B1B</div><div class="swatch-usage">Screen titles · Headers · Brand</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#F59E0B"></div><div class="swatch-info"><div class="swatch-name">Gold</div><div class="swatch-hex">#F59E0B</div><div class="swatch-usage">XP · Streaks · Rewards · Stars</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#1D4ED8"></div><div class="swatch-info"><div class="swatch-name">Royal Blue</div><div class="swatch-hex">#1D4ED8</div><div class="swatch-usage">Age 7–11 accent · Links</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#7C3AED"></div><div class="swatch-info"><div class="swatch-name">Purple</div><div class="swatch-hex">#7C3AED</div><div class="swatch-usage">Age 11–15 accent · Audio play</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#059669"></div><div class="swatch-info"><div class="swatch-name">Green</div><div class="swatch-hex">#059669</div><div class="swatch-usage">Success · Completed · Badges earned</div></div></div>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:10px">Neutrals & backgrounds</div>
+    <div class="color-grid" style="margin-bottom:20px">
+      <div class="swatch"><div class="swatch-color" style="background:#FFFBEB"></div><div class="swatch-info"><div class="swatch-name">Cream (App BG)</div><div class="swatch-hex">#FFFBEB</div><div class="swatch-usage">Default screen background</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#FEF9EE"></div><div class="swatch-info"><div class="swatch-name">Cream 2</div><div class="swatch-hex">#FEF9EE</div><div class="swatch-usage">Secondary bg, stat boxes</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#FFFFFF;border:1px solid #E5E7EB"></div><div class="swatch-info"><div class="swatch-name">White</div><div class="swatch-hex">#FFFFFF</div><div class="swatch-usage">Cards, input fields, story text</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#F3F4F6"></div><div class="swatch-info"><div class="swatch-name">Gray 100</div><div class="swatch-hex">#F3F4F6</div><div class="swatch-usage">Disabled states, locked content</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#E5E7EB"></div><div class="swatch-info"><div class="swatch-name">Gray 200 (Border)</div><div class="swatch-hex">#E5E7EB</div><div class="swatch-usage">Default card/input border</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#1F2937"></div><div class="swatch-info"><div class="swatch-name">Text Primary</div><div class="swatch-hex">#1F2937</div><div class="swatch-usage">Body text, labels</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#6B7280"></div><div class="swatch-info"><div class="swatch-name">Text Secondary</div><div class="swatch-hex">#6B7280</div><div class="swatch-usage">Subtitles, metadata</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#9CA3AF"></div><div class="swatch-info"><div class="swatch-name">Text Hint</div><div class="swatch-hex">#9CA3AF</div><div class="swatch-usage">Placeholders, empty state</div></div></div>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:var(--txt);margin-bottom:10px">Light variants (for backgrounds)</div>
+    <div class="color-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#FFF5EE"></div><div class="swatch-info"><div class="swatch-name">Saffron Light</div><div class="swatch-hex">#FFF5EE</div><div class="swatch-usage">Selected state bg</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#FEF3C7"></div><div class="swatch-info"><div class="swatch-name">Gold Light</div><div class="swatch-hex">#FEF3C7</div><div class="swatch-usage">Word highlight bg</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#EDE9FE"></div><div class="swatch-info"><div class="swatch-name">Purple Light</div><div class="swatch-hex">#EDE9FE</div><div class="swatch-usage">Shloka card bg</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#D1FAE5"></div><div class="swatch-info"><div class="swatch-name">Green Light</div><div class="swatch-hex">#D1FAE5</div><div class="swatch-usage">Completed state bg</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#EFF6FF"></div><div class="swatch-info"><div class="swatch-name">Blue Light</div><div class="swatch-hex">#EFF6FF</div><div class="swatch-usage">Age 7–11 card bg</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#FEE2E2"></div><div class="swatch-info"><div class="swatch-name">Red Light</div><div class="swatch-hex">#FEE2E2</div><div class="swatch-usage">Wrong answer bg</div></div></div>
+    </div>
+  </div>
+
+  <!-- ── TYPOGRAPHY ── -->
+  <div class="section" id="typography">
+    <div class="section-title">Typography</div>
+    <div class="section-desc">System font stack: SF Pro Display on iOS, Roboto on Android. Baloo 2 (Google Fonts) used for game UI and child-facing text — more playful and legible for young readers.</div>
+    <table>
+      <thead><tr><th>Token</th><th>Size</th><th>Weight</th><th>Line height</th><th>Usage</th><th>Preview</th></tr></thead>
+      <tbody>
+        <tr><td><code>display-xl</code></td><td>28px</td><td>800</td><td>1.2</td><td>Splash screen title</td><td style="font-size:28px;font-weight:800;color:var(--maroon)">Dharma</td></tr>
+        <tr><td><code>display-lg</code></td><td>22px</td><td>700</td><td>1.3</td><td>Screen title, completion</td><td style="font-size:22px;font-weight:700;color:var(--maroon)">शाबाश!</td></tr>
+        <tr><td><code>title-lg</code></td><td>18px</td><td>700</td><td>1.3</td><td>Section header, card title</td><td style="font-size:18px;font-weight:700">Stories 📖</td></tr>
+        <tr><td><code>title-md</code></td><td>16px</td><td>700</td><td>1.4</td><td>Nav screen name, story title</td><td style="font-size:16px;font-weight:700">Ganesha Wins the Race</td></tr>
+        <tr><td><code>title-sm</code></td><td>14px</td><td>700</td><td>1.4</td><td>Game name, list item primary</td><td style="font-size:14px;font-weight:700">Word Scramble</td></tr>
+        <tr><td><code>body-lg</code></td><td>17px</td><td>600</td><td>1.6</td><td>Story text (player screen)</td><td style="font-size:17px;font-weight:600">मेरे माता-पिता मेरा संसार हैं!</td></tr>
+        <tr><td><code>body-md</code></td><td>14px</td><td>400</td><td>1.6</td><td>Description, parent dashboard</td><td style="font-size:14px">Complete all tasks to earn XP</td></tr>
+        <tr><td><code>body-sm</code></td><td>12px</td><td>400</td><td>1.5</td><td>Metadata, subtitles</td><td style="font-size:12px;color:var(--txt2)">5 slides · 3 min · Hindi</td></tr>
+        <tr><td><code>label</code></td><td>11px</td><td>600</td><td>1.4</td><td>Pills, badges, tab labels</td><td style="font-size:11px;font-weight:600;color:var(--saffron)">PREMIUM · 50 XP</td></tr>
+        <tr><td><code>caption</code></td><td>10px</td><td>400</td><td>1.4</td><td>Timestamp, fine print</td><td style="font-size:10px;color:var(--txt3)">Resets in 6h 30m</td></tr>
+        <tr><td><code>mono</code></td><td>12px</td><td>400</td><td>1.4</td><td>Score display, debug info</td><td style="font-size:12px;font-family:monospace">#FF6B35 · 390×844</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:16px;background:#FEF3C7;border-radius:10px;padding:12px 16px;font-size:13px;color:#92400E">
+      <strong>Devanagari note:</strong> Hindi / Marathi / Sanskrit text uses <code>Noto Sans Devanagari</code> (Google Fonts). Load alongside Baloo 2. Always set <code>font-size: 18px+</code> for Devanagari script — it becomes illegible below 14px for children.
+    </div>
+  </div>
+
+  <!-- ── SPACING ── -->
+  <div class="section" id="spacing">
+    <div class="section-title">Spacing</div>
+    <div class="section-desc">4px base unit. All spacing is a multiple of 4. Use the token names in code.</div>
+    <div class="space-grid">
+      <div class="space-row"><div class="space-label">sp-4 · 4px</div><div class="space-bar" style="width:4px"></div><div class="space-usage">Icon internal padding, dot gaps</div></div>
+      <div class="space-row"><div class="space-label">sp-8 · 8px</div><div class="space-bar" style="width:8px"></div><div class="space-usage">Between badges/pills, small gaps</div></div>
+      <div class="space-row"><div class="space-label">sp-12 · 12px</div><div class="space-bar" style="width:12px"></div><div class="space-usage">Card internal padding (compact)</div></div>
+      <div class="space-row"><div class="space-label">sp-16 · 16px</div><div class="space-bar" style="width:16px"></div><div class="space-usage">Screen horizontal margin, card padding</div></div>
+      <div class="space-row"><div class="space-label">sp-20 · 20px</div><div class="space-bar" style="width:20px"></div><div class="space-usage">Between major sections</div></div>
+      <div class="space-row"><div class="space-label">sp-24 · 24px</div><div class="space-bar" style="width:24px"></div><div class="space-usage">Header padding, section gap</div></div>
+      <div class="space-row"><div class="space-label">sp-32 · 32px</div><div class="space-bar" style="width:32px"></div><div class="space-usage">Large illustration margin</div></div>
+      <div class="space-row"><div class="space-label">sp-48 · 48px</div><div class="space-bar" style="width:48px"></div><div class="space-usage">Bottom tab bar height, safe areas</div></div>
+    </div>
+  </div>
+
+  <!-- ── BORDER RADIUS ── -->
+  <div class="section" id="radius">
+    <div class="section-title">Border Radius</div>
+    <div class="section-desc">Round, friendly corners for child-facing UI. Larger radius = more playful. Use xs only for tags.</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap">
+      <div><div style="width:60px;height:60px;background:var(--saffron);border-radius:4px;margin-bottom:8px"></div><div style="font-size:12px;font-weight:600">xs · 4px</div><div style="font-size:11px;color:var(--txt3)">Inline tags only</div></div>
+      <div><div style="width:60px;height:60px;background:var(--saffron);border-radius:8px;margin-bottom:8px"></div><div style="font-size:12px;font-weight:600">sm · 8px</div><div style="font-size:11px;color:var(--txt3)">Chips, small buttons</div></div>
+      <div><div style="width:60px;height:60px;background:var(--saffron);border-radius:14px;margin-bottom:8px"></div><div style="font-size:12px;font-weight:600">md · 14px</div><div style="font-size:11px;color:var(--txt3)">Cards (default)</div></div>
+      <div><div style="width:60px;height:60px;background:var(--saffron);border-radius:20px;margin-bottom:8px"></div><div style="font-size:12px;font-weight:600">lg · 20px</div><div style="font-size:11px;color:var(--txt3)">Story cards, phone frames</div></div>
+      <div><div style="width:60px;height:60px;background:var(--saffron);border-radius:999px;margin-bottom:8px"></div><div style="font-size:12px;font-weight:600">pill · 999px</div><div style="font-size:11px;color:var(--txt3)">Pills, progress bars</div></div>
+      <div><div style="width:60px;height:60px;background:var(--saffron);border-radius:50%;margin-bottom:8px"></div><div style="font-size:12px;font-weight:600">circle · 50%</div><div style="font-size:11px;color:var(--txt3)">Avatars, nav buttons</div></div>
+    </div>
+  </div>
+
+  <!-- ── ELEVATION ── -->
+  <div class="section" id="elevation">
+    <div class="section-title">Elevation</div>
+    <div class="section-desc">No heavy drop shadows — they feel dated on modern iOS/Android. Use border + background distinction instead.</div>
+    <div style="display:flex;gap:20px;align-items:flex-end;flex-wrap:wrap">
+      <div style="text-align:center"><div class="el-box" style="border:1px solid var(--brd)">Flat</div><div style="font-size:11px;color:var(--txt3);margin-top:6px">Level 0<br>border only</div></div>
+      <div style="text-align:center"><div class="el-box" style="box-shadow:0 1px 3px rgba(0,0,0,.08);border:1px solid var(--brd)">Card</div><div style="font-size:11px;color:var(--txt3);margin-top:6px">Level 1<br>story cards</div></div>
+      <div style="text-align:center"><div class="el-box" style="box-shadow:0 4px 12px rgba(0,0,0,.08);border:1px solid var(--brd)">Modal</div><div style="font-size:11px;color:var(--txt3);margin-top:6px">Level 2<br>bottom sheet</div></div>
+      <div style="text-align:center"><div class="el-box" style="box-shadow:0 4px 16px rgba(255,107,53,.4);background:var(--saffron);color:#fff">CTA</div><div style="font-size:11px;color:var(--txt3);margin-top:6px">Colored<br>primary CTA</div></div>
+    </div>
+  </div>
+
+  <!-- ── MOTION ── -->
+  <div class="section" id="motion">
+    <div class="section-title">Motion</div>
+    <div class="section-desc">Quick, snappy transitions feel responsive to children. Avoid slow, cinematic animations — they feel sluggish on mid-range Android phones.</div>
+    <table>
+      <thead><tr><th>Token</th><th>Duration</th><th>Easing</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>instant</code></td><td>80ms</td><td>ease-out</td><td>Button press feedback, tap highlight</td></tr>
+        <tr><td><code>fast</code></td><td>150ms</td><td>ease-out</td><td>Card press scale, pill select</td></tr>
+        <tr><td><code>default</code></td><td>250ms</td><td>spring (tension:65, friction:11)</td><td>Screen slide-in, modal appear</td></tr>
+        <tr><td><code>slow</code></td><td>400ms</td><td>ease-in-out</td><td>Progress bar fill, XP counter</td></tr>
+        <tr><td><code>celebration</code></td><td>600ms</td><td>spring bounce</td><td>Badge earned, perfect score</td></tr>
+        <tr><td><code>pulse</code></td><td>800ms loop</td><td>ease-in-out</td><td>Playing audio indicator, active state</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:14px;background:var(--blue-l);border-radius:10px;padding:12px 16px;font-size:13px;color:#1E3A8A">
+      <strong>Haptics:</strong> Use <code>Haptics.impactAsync(Light)</code> on slide advance. <code>Haptics.notificationAsync(Success)</code> on story completion or badge earn. <code>Haptics.impactAsync(Medium)</code> on correct quiz answer. No haptic on wrong answers — avoid punishing feeling.
+    </div>
+  </div>
+
+  <!-- ── GRID ── -->
+  <div class="section" id="grid">
+    <div class="section-title">Grid</div>
+    <div class="section-desc">Frame: 390px wide. 16px gutters left/right. Variable columns based on context.</div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px">1-column (default) — full-width cards, CTAs</div>
+        <div class="grid-demo"><div class="grid-col"></div></div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:4px">Content width: 358px (390 − 16 − 16)</div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px">2-column — story grid, stat cards, game cards</div>
+        <div class="grid-demo"><div class="grid-col"></div><div class="grid-col"></div></div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:4px">Each column: 171px (358 − 8 gap) ÷ 2</div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px">3-column — badge grid, stat mini cards</div>
+        <div class="grid-demo"><div class="grid-col"></div><div class="grid-col"></div><div class="grid-col"></div></div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:4px">Each column: 112px. Minimum tap target: 44px ✓</div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px">4-column — avatar row, dot pagination</div>
+        <div class="grid-demo"><div class="grid-col"></div><div class="grid-col"></div><div class="grid-col"></div><div class="grid-col"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BUTTONS ── -->
+  <div class="section" id="buttons">
+    <div class="section-title">Buttons</div>
+    <div class="section-desc">All buttons: min height 44px (touch target). Font-weight 700. Border-radius 14px (md). Full-width in most mobile contexts.</div>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <div class="comp-name">Primary</div>
+        <div class="comp-spec">bg: saffron · text: white · h:48px · radius:14px</div>
+        <div class="comp-preview"><button class="btn btn-primary">Start Learning 🚀</button></div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-name">Secondary</div>
+        <div class="comp-spec">bg: white · border: saffron 2px · text: saffron</div>
+        <div class="comp-preview"><button class="btn btn-secondary">See All Stories</button></div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-name">Ghost</div>
+        <div class="comp-spec">bg: transparent · border: gray · text: gray</div>
+        <div class="comp-preview"><button class="btn btn-ghost">Skip for now</button></div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-name">Danger</div>
+        <div class="comp-spec">bg: #FEE2E2 · text: #991B1B · for destructive actions</div>
+        <div class="comp-preview"><button class="btn" style="background:#FEE2E2;color:#991B1B;padding:12px 24px;border:none;border-radius:14px;font-size:15px;font-weight:700">Delete account</button></div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-name">Icon + text (nav back)</div>
+        <div class="comp-spec">circle 40px · border: saffron · icon inside</div>
+        <div class="comp-preview"><div style="width:40px;height:40px;border-radius:50%;border:2px solid var(--saffron);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--saffron);cursor:default">←</div></div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-name">Audio play button</div>
+        <div class="comp-spec">bg: purple · min-w:100px · h:48px · pulse animation</div>
+        <div class="comp-preview"><button class="btn" style="background:var(--purple);color:#fff;padding:12px 28px;border:none;border-radius:24px;font-size:16px;font-weight:700">🔊 Listen</button></div>
+      </div>
+    </div>
+    <div style="margin-top:16px;background:var(--saffron-ll);border-radius:10px;padding:12px 16px;font-size:13px;color:#92400E">
+      <strong>Touch target rule:</strong> All tappable elements must be ≥44×44px. If a visual element is smaller (e.g. a dot), expand its hitbox with padding. This is non-negotiable for age 3–6 screens where children have imprecise motor control.
+    </div>
+  </div>
+
+  <!-- ── PILLS ── -->
+  <div class="section" id="pills">
+    <div class="section-title">Pills & Tags</div>
+    <div class="section-desc">Used for categories, status, XP rewards, and labels. All pills use border-radius: 999px.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <span class="pill" style="background:var(--saffron-ll);color:#92400E">New</span>
+      <span class="pill" style="background:var(--green-l);color:#065F46">✓ Completed</span>
+      <span class="pill" style="background:var(--purple-l);color:#4C1D95">Premium</span>
+      <span class="pill" style="background:#EEF2FF;color:#3730A3">Daily Challenge</span>
+      <span class="pill" style="background:#FEE2E2;color:#991B1B">🔒 Locked</span>
+      <span class="pill" style="background:var(--bg2);color:var(--txt2)">Coming soon</span>
+      <span class="pill" style="background:var(--saffron);color:#fff">+20 XP</span>
+      <span class="pill" style="background:var(--gold-l);color:#92400E">🔥 7 days</span>
+    </div>
+    <table>
+      <thead><tr><th>Type</th><th>Background</th><th>Text color</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td>New content</td><td><code>#FEF3C7</code></td><td><code>#92400E</code></td><td>Recently added stories/games</td></tr>
+        <tr><td>Completed</td><td><code>#D1FAE5</code></td><td><code>#065F46</code></td><td>Finished stories, earned badges</td></tr>
+        <tr><td>Premium</td><td><code>#EDE9FE</code></td><td><code>#4C1D95</code></td><td>Gated premium content</td></tr>
+        <tr><td>XP reward</td><td><code>#FF6B35</code></td><td><code>#FFFFFF</code></td><td>Points earned on task cards</td></tr>
+        <tr><td>Locked</td><td><code>#FEE2E2</code></td><td><code>#991B1B</code></td><td>Age-inappropriate or premium</td></tr>
+        <tr><td>Coming soon</td><td><code>#F3F4F6</code></td><td><code>#6B7280</code></td><td>Future language availability</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── CARDS ── -->
+  <div class="section" id="cards">
+    <div class="section-title">Cards</div>
+    <div class="section-desc">Cards are the primary content container. Always white background, 1px border, radius-md (14px).</div>
+    <div class="comp-grid">
+      <div class="comp-card">
+        <div class="comp-name">Story card (grid)</div>
+        <div class="comp-spec">2-column grid · thumb 66px · radius:14px</div>
+        <div class="comp-preview">
+          <div class="preview-card">
+            <div style="height:64px;background:#FFF5EE;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:8px">🏹</div>
+            <div style="font-size:12px;font-weight:700;color:var(--txt)">Rama & Ravana</div>
+            <div style="font-size:10px;color:var(--txt2);margin-top:2px">5 slides · 3 min</div>
+            <div style="height:4px;background:var(--brd);border-radius:99px;margin-top:6px;overflow:hidden"><div style="width:100%;height:100%;background:var(--green);border-radius:99px"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-name">Game card (list)</div>
+        <div class="comp-spec">Full width · h:52px · icon + text + CTA pill</div>
+        <div class="comp-preview">
+          <div style="background:#fff;border:1px solid var(--brd);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;width:100%">
+            <div style="font-size:24px">🔤</div>
+            <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--txt)">Word Scramble</div><div style="font-size:10px;color:var(--txt2)">Best: 11/12</div></div>
+            <span class="pill" style="background:var(--saffron-ll);color:#92400E">Play</span>
+          </div>
+        </div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-name">Festival banner</div>
+        <div class="comp-spec">bg: gold-light · border: gold · accent left icon</div>
+        <div class="comp-preview">
+          <div style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;width:100%">
+            <span style="font-size:22px">🪔</span>
+            <div><div style="font-size:12px;font-weight:700;color:#92400E">Diwali in 3 days!</div><div style="font-size:10px;color:#B45309">Special stories unlocked</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="comp-card">
+        <div class="comp-name">Stat card (3-up)</div>
+        <div class="comp-spec">bg: cream2 · border:none · centered · no radius</div>
+        <div class="comp-preview" style="gap:6px">
+          <div style="background:var(--bg2);border-radius:10px;padding:10px;text-align:center;flex:1"><div style="font-size:16px;font-weight:700;color:var(--txt)">18</div><div style="font-size:9px;color:var(--txt2)">stories</div></div>
+          <div style="background:var(--bg2);border-radius:10px;padding:10px;text-align:center;flex:1"><div style="font-size:16px;font-weight:700;color:var(--txt)">🔥12</div><div style="font-size:9px;color:var(--txt2)">streak</div></div>
+          <div style="background:var(--bg2);border-radius:10px;padding:10px;text-align:center;flex:1"><div style="font-size:16px;font-weight:700;color:var(--txt)">6</div><div style="font-size:9px;color:var(--txt2)">badges</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PROGRESS ── -->
+  <div class="section" id="progress">
+    <div class="section-title">Progress Bars</div>
+    <div class="section-desc">Used for story progress, XP, daily challenge, skill levels. Always animate on mount.</div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div><div style="font-size:12px;color:var(--txt2);margin-bottom:6px">Story progress — thin (5px) · saffron</div><div style="height:5px;background:var(--brd);border-radius:99px;overflow:hidden;width:300px"><div style="width:60%;height:100%;background:var(--saffron);border-radius:99px"></div></div></div>
+      <div><div style="font-size:12px;color:var(--txt2);margin-bottom:6px">XP progress — medium (8px) · gold · labeled</div><div style="display:flex;align-items:center;gap:10px;width:300px"><div style="height:8px;background:var(--brd);border-radius:99px;overflow:hidden;flex:1"><div style="width:68%;height:100%;background:var(--gold);border-radius:99px"></div></div><span style="font-size:11px;color:var(--txt2)">340/500</span></div></div>
+      <div><div style="font-size:12px;color:var(--txt2);margin-bottom:6px">Topic coverage — per category color</div><div style="display:flex;flex-direction:column;gap:8px;width:300px"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;color:var(--txt2);min-width:80px">Ramayana</span><div style="height:6px;background:var(--brd);border-radius:99px;overflow:hidden;flex:1"><div style="width:80%;height:100%;background:var(--saffron);border-radius:99px"></div></div><span style="font-size:10px;color:var(--txt3)">4</span></div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;color:var(--txt2);min-width:80px">Krishna</span><div style="height:6px;background:var(--brd);border-radius:99px;overflow:hidden;flex:1"><div style="width:40%;height:100%;background:var(--purple);border-radius:99px"></div></div><span style="font-size:10px;color:var(--txt3)">2</span></div></div></div>
+    </div>
+  </div>
+
+  <!-- ── ICONS ── -->
+  <div class="section" id="icons">
+    <div class="section-title">Icons & Emoji</div>
+    <div class="section-desc">Emoji are used as primary icons throughout the child-facing UI — they are universally understood, multilingual, and require zero asset management. System SF Symbols / Material Icons used only in parent-facing screens.</div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:10px">Deity icons (consistent throughout app)</div>
+    <div class="icon-grid" style="margin-bottom:20px">
+      <div class="icon-item"><div class="ico">🐘</div><div class="ico-lbl">Ganesh</div></div>
+      <div class="icon-item"><div class="ico">🦚</div><div class="ico-lbl">Krishna</div></div>
+      <div class="icon-item"><div class="ico">💪</div><div class="ico-lbl">Hanuman</div></div>
+      <div class="icon-item"><div class="ico">🪔</div><div class="ico-lbl">Lakshmi</div></div>
+      <div class="icon-item"><div class="ico">🏹</div><div class="ico-lbl">Rama</div></div>
+      <div class="icon-item"><div class="ico">🔱</div><div class="ico-lbl">Shiva</div></div>
+      <div class="icon-item"><div class="ico">⚔️</div><div class="ico-lbl">Durga</div></div>
+      <div class="icon-item"><div class="ico">🎵</div><div class="ico-lbl">Saraswati</div></div>
+    </div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:10px">UI icons (tab bar, actions)</div>
+    <div class="icon-grid">
+      <div class="icon-item"><div class="ico">🏠</div><div class="ico-lbl">Home</div></div>
+      <div class="icon-item"><div class="ico">📖</div><div class="ico-lbl">Stories</div></div>
+      <div class="icon-item"><div class="ico">🎮</div><div class="ico-lbl">Games</div></div>
+      <div class="icon-item"><div class="ico">👤</div><div class="ico-lbl">Profile</div></div>
+      <div class="icon-item"><div class="ico">🔍</div><div class="ico-lbl">Search</div></div>
+      <div class="icon-item"><div class="ico">🔊</div><div class="ico-lbl">Audio</div></div>
+      <div class="icon-item"><div class="ico">🔥</div><div class="ico-lbl">Streak</div></div>
+      <div class="icon-item"><div class="ico">⭐</div><div class="ico-lbl">Stars/XP</div></div>
+      <div class="icon-item"><div class="ico">🏆</div><div class="ico-lbl">Win/Badge</div></div>
+      <div class="icon-item"><div class="ico">🔒</div><div class="ico-lbl">Locked</div></div>
+      <div class="icon-item"><div class="ico">🕉️</div><div class="ico-lbl">OM / Brand</div></div>
+      <div class="icon-item"><div class="ico">📤</div><div class="ico-lbl">Share</div></div>
+    </div>
+  </div>
+
+  <!-- ── AGE THEMES ── -->
+  <div class="section" id="age-themes">
+    <div class="section-title">Age Group Themes</div>
+    <div class="section-desc">Each age group has a distinct header color and accent. The UI simplifies for younger groups — larger tap targets, more emoji, less text.</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+      <div style="border-radius:14px;overflow:hidden;border:1px solid var(--brd)">
+        <div style="background:var(--saffron);height:80px;display:flex;align-items:center;justify-content:center;font-size:36px">🌸</div>
+        <div style="padding:14px;background:#fff">
+          <div style="font-size:14px;font-weight:700;color:var(--saffron)">Ages 3–6</div>
+          <div style="font-size:11px;color:var(--txt2);margin-top:4px">Header: Saffron #FF6B35<br>Accent: Gold #F59E0B<br>Min tap: 52px<br>Font: 18px+ body<br>Content: Voice-first, no reading required</div>
+          <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:4px"><span class="tag">emoji-only nav</span><span class="tag">large buttons</span><span class="tag">auto-play stories</span></div>
+        </div>
+      </div>
+      <div style="border-radius:14px;overflow:hidden;border:1px solid var(--brd)">
+        <div style="background:var(--blue);height:80px;display:flex;align-items:center;justify-content:center;font-size:36px">📚</div>
+        <div style="padding:14px;background:#fff">
+          <div style="font-size:14px;font-weight:700;color:var(--blue)">Ages 7–11</div>
+          <div style="font-size:11px;color:var(--txt2);margin-top:4px">Header: Royal Blue #1D4ED8<br>Accent: Saffron #FF6B35<br>Min tap: 44px<br>Font: 13px+ body<br>Content: Puzzles, scores, leaderboard</div>
+          <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:4px"><span class="tag">XP counter</span><span class="tag">leaderboard</span><span class="tag">daily challenge</span></div>
+        </div>
+      </div>
+      <div style="border-radius:14px;overflow:hidden;border:1px solid var(--brd)">
+        <div style="background:var(--purple);height:80px;display:flex;align-items:center;justify-content:center;font-size:36px">🎓</div>
+        <div style="padding:14px;background:#fff">
+          <div style="font-size:14px;font-weight:700;color:var(--purple)">Ages 11–15</div>
+          <div style="font-size:11px;color:var(--txt2);margin-top:4px">Header: Purple #7C3AED<br>Accent: Teal #0D9488<br>Min tap: 44px<br>Font: 13px+ body<br>Content: Philosophy, Sanskrit, debate</div>
+          <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:4px"><span class="tag">dense information</span><span class="tag">source citations</span><span class="tag">sanskrit text</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:40px 0 20px;font-size:12px;color:var(--txt3)">
+    Dharma Seekho Design System v1.0 · May 2025 · For internal use only<br>
+    Open <code>DharmaSeeho_Screens.svg</code> in Figma (File → Import) to view all 13 screen artboards
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.nav-item').forEach(a=>{
+  a.addEventListener('click',function(e){
+    e.preventDefault();
+    document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+    const target=document.querySelector(this.getAttribute('href'));
+    if(target) target.scrollIntoView({behavior:'smooth'});
+  });
+});
+window.addEventListener('scroll',()=>{
+  const sections=document.querySelectorAll('.section');
+  sections.forEach(s=>{
+    const rect=s.getBoundingClientRect();
+    if(rect.top<200&&rect.bottom>0){
+      const id=s.id;
+      document.querySelectorAll('.nav-item').forEach(a=>{
+        a.classList.toggle('active',a.getAttribute('href')==='#'+id);
+      });
+    }
+  });
+});
+</script>
+</body>
+</html>

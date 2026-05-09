@@ -1,0 +1,13 @@
+{
+  "name": "dharma-seekho",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "admin": "npm run dev --workspace=apps/admin",
+    "mobile": "npm run start --workspace=apps/mobile",
+    "type-check": "npm run type-check --workspaces --if-present"
+  }
+}

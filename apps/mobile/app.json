@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Dharma Seekho",
+    "slug": "dharma-seekho",
+    "version": "1.0.0",
+    "scheme": "dharmaseeho",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FF6B00"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.dharmaseeho.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FF6B00"
+      },
+      "package": "com.dharmaseeho.app",
+      "permissions": []
+    },
+    "plugins": [
+      "expo-router",
+      ["expo-av", { "microphonePermission": false }]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

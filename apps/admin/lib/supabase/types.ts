@@ -1,0 +1,23 @@
+// Re-export from shared package — single source of truth
+export type {
+  LanguageCode,
+  MultilingualText,
+  AgeGroup,
+  ContentStatus,
+  AdminRole,
+  StoryCategory,
+  SubscriptionPlan,
+  SubscriptionStatus,
+  Profile,
+  Child,
+  Story,
+  StorySlide,
+  Shloka,
+  Quiz,
+  QuizQuestion,
+  Badge,
+  UserProgress,
+  UserBadge,
+  WordTimestamp,
+  Database,
+} from '@dharma-seekho/shared'

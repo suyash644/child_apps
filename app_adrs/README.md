@@ -228,18 +228,24 @@ supabase db push  # applies pending migrations to production
 
 ## ADRs
 
-Architecture Decision Records live in `docs/adr/`. Each ADR documents a significant technical decision, its context, and the rationale.
+Architecture Decision Records live in `app_adrs/`. Each ADR documents a significant technical decision, its context, and the rationale.
 
 | # | Title | Status |
 |---|-------|--------|
-| [001](docs/adr/001-react-native-over-flutter.md) | React Native over Flutter | Accepted |
-| [002](docs/adr/002-supabase-as-backend.md) | Supabase as backend | Accepted |
-| [003](docs/adr/003-google-tts-for-voice.md) | Google TTS for voice narration | Accepted |
-| [004](docs/adr/004-multilingual-json-columns.md) | Multilingual JSON columns | Accepted |
-| [005](docs/adr/005-pre-generated-audio.md) | Pre-generated audio over real-time TTS | Accepted |
-| [006](docs/adr/006-freemium-model.md) | Freemium monetization model | Accepted |
-| [007](docs/adr/007-android-first.md) | Android-first launch | Accepted |
-| [008](docs/adr/008-expo-managed-workflow.md) | Expo managed workflow | Accepted |
+| [001](001-react-native-over-flutter.md) | React Native over Flutter | Accepted |
+| [002](002-supabase-as-backend.md) | Supabase as backend | Accepted |
+| [003](003-google-tts-for-voice.md) | Google TTS for voice narration | Accepted |
+| [004](004-multilingual-json-columns.md) | Multilingual JSON columns | Accepted |
+| [005](005-pre-generated-audio.md) | Pre-generated audio over real-time TTS | Accepted |
+| [006](006-freemium-model.md) | Freemium monetization model | Accepted |
+| [007](007-android-first.md) | Android-first launch | Accepted |
+| [008](008-expo-managed-workflow.md) | Expo managed workflow | Accepted |
+| [009](009-admin-panel-nextjs.md) | Admin panel as custom Next.js app | Accepted |
+| [010](010-content-workflow.md) | Content workflow: Draft → Review → Published | Accepted |
+| [011](011-admin-rbac.md) | Admin role-based access control | Accepted |
+| [012](012-analytics-strategy.md) | Analytics strategy: PostHog | Accepted |
+| [013](013-offline-caching-strategy.md) | Offline and caching strategy | Accepted |
+| [014](014-razorpay-payments.md) | Razorpay for Indian payment processing | Accepted |
 
 ---
 

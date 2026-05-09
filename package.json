@@ -9,5 +9,8 @@
     "admin": "npm run dev --workspace=apps/admin",
     "mobile": "npm run start --workspace=apps/mobile",
     "type-check": "npm run type-check --workspaces --if-present"
+  },
+  "dependencies": {
+    "supabase": "^2.98.2"
   }
 }

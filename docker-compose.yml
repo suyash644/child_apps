@@ -1,0 +1,161 @@
+name: dharma-seekho
+
+# Start everything:  cp .env.docker.example .env.docker && docker compose --env-file .env.docker up --build
+# View OTP codes:    docker compose logs auth | grep -i otp
+# Reset database:    docker compose down -v && docker compose --env-file .env.docker up --build
+
+services:
+
+  # ── PostgreSQL (Supabase image includes auth/storage schemas) ─────────────
+  db:
+    image: supabase/postgres:15.1.0.147
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # ── Run migrations once after DB is healthy ───────────────────────────────
+  migrations:
+    image: postgres:15-alpine
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGHOST: db
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGDATABASE: postgres
+    volumes:
+      - ./supabase/migrations:/migrations:ro
+      - ./supabase/seed.sql:/seed.sql:ro
+      - ./.docker/run-migrations.sh:/run-migrations.sh:ro
+    entrypoint: ["/bin/sh", "/run-migrations.sh"]
+
+  # ── Supabase Auth (GoTrue) ────────────────────────────────────────────────
+  auth:
+    image: supabase/gotrue:v2.151.0
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GOTRUE_API_HOST: "0.0.0.0"
+      GOTRUE_API_PORT: "9999"
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@db:5432/postgres?search_path=auth
+      GOTRUE_SITE_URL: http://localhost:3001
+      GOTRUE_URI_ALLOW_LIST: "http://localhost:3001/**,http://localhost:8081/**"
+      GOTRUE_DISABLE_SIGNUP: "false"
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
+      GOTRUE_JWT_EXP: "3600"
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      API_EXTERNAL_URL: http://localhost:8000
+      # Phone OTP ── "test" provider logs OTP to stdout instead of sending SMS.
+      # Run: docker compose logs auth | grep -i "otp\|token\|phone"
+      # Switch to "twilio" + fill TWILIO_* vars in .env.docker for real SMS.
+      GOTRUE_EXTERNAL_PHONE_ENABLED: "true"
+      GOTRUE_SMS_PROVIDER: ${SMS_PROVIDER:-test}
+      GOTRUE_SMS_TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      GOTRUE_SMS_TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      GOTRUE_SMS_TWILIO_MESSAGE_SERVICE_SID: ${TWILIO_MESSAGE_SERVICE_SID:-}
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: "false"
+
+  # ── PostgREST (auto-generated REST API from PostgreSQL schema) ────────────
+  rest:
+    image: postgrest/postgrest:v12.0.2
+    restart: unless-stopped
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@db:5432/postgres
+      PGRST_DB_SCHEMAS: public,storage
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+    command: postgrest
+
+  # ── Supabase Storage ──────────────────────────────────────────────────────
+  storage:
+    image: supabase/storage-api:v1.0.6
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      rest:
+        condition: service_started
+    environment:
+      ANON_KEY: ${ANON_KEY}
+      SERVICE_KEY: ${SERVICE_ROLE_KEY}
+      POSTGREST_URL: http://rest:3000
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@db:5432/postgres
+      FILE_SIZE_LIMIT: "10485760"
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: stub
+      REGION: local
+      GLOBAL_S3_BUCKET: stub
+      ENABLE_IMAGE_TRANSFORMATION: "false"
+    volumes:
+      - storage_data:/var/lib/storage
+
+  # ── Nginx (API gateway, replaces Kong for local dev) ─────────────────────
+  proxy:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./.docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - auth
+      - rest
+      - storage
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8000/rest/v1/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Admin Panel (Next.js) ─────────────────────────────────────────────────
+  admin:
+    build:
+      context: .
+      dockerfile: .docker/admin.Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: http://localhost:8000
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${ANON_KEY}
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      NEXT_PUBLIC_SUPABASE_URL: http://localhost:8000
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${ANON_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
+      # Internal URL for Next.js SSR — avoids the host network roundtrip
+      SUPABASE_URL_INTERNAL: http://proxy:8000
+    depends_on:
+      proxy:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+
+volumes:
+  db_data:
+  storage_data:

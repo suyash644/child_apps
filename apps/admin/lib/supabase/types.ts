@@ -1,4 +1,4 @@
-// Re-export from shared package — single source of truth
+// Re-export local types — previously pointed at @dharma-seekho/shared
 export type {
   LanguageCode,
   MultilingualText,
@@ -6,18 +6,6 @@ export type {
   ContentStatus,
   AdminRole,
   StoryCategory,
-  SubscriptionPlan,
-  SubscriptionStatus,
-  Profile,
-  Child,
   Story,
   StorySlide,
-  Shloka,
-  Quiz,
-  QuizQuestion,
-  Badge,
-  UserProgress,
-  UserBadge,
-  WordTimestamp,
-  Database,
-} from '@dharma-seekho/shared'
+} from '@/lib/types'

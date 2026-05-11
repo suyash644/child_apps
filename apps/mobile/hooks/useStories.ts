@@ -1,7 +1,5 @@
-// React Query hooks for stories (ADR 013: 24-hour cache)
-
 import { useQuery } from '@tanstack/react-query'
-import { supabase } from '@/lib/supabase'
+import { pb } from '@/lib/pb'
 import type { LanguageCode } from '@/lib/i18n'
 
 export type AgeGroup = 'tiny_devotee' | 'young_scholar' | 'dharma_scholar'
@@ -33,19 +31,17 @@ export function useStories(ageGroup?: AgeGroup) {
   return useQuery({
     queryKey: ['stories', ageGroup],
     queryFn: async () => {
-      let query = supabase
-        .from('stories')
-        .select('id, category, age_group, title, description, thumbnail_url, is_premium')
-        .eq('status', 'published')
-        .order('display_order')
+      const filters = ['status = "published"']
+      if (ageGroup) filters.push(`age_group = "${ageGroup}"`)
 
-      if (ageGroup) query = query.eq('age_group', ageGroup)
-
-      const { data, error } = await query
-      if (error) throw error
-      return data as StoryListItem[]
+      const result = await pb.collection('stories').getList<StoryListItem>(1, 50, {
+        filter: filters.join(' && '),
+        sort: 'display_order',
+        fields: 'id,category,age_group,title,description,thumbnail_url,is_premium',
+      })
+      return result.items
     },
-    staleTime: 24 * 60 * 60 * 1000, // 24-hour cache (ADR 013)
+    staleTime: 24 * 60 * 60 * 1000,
     gcTime: 48 * 60 * 60 * 1000,
   })
 }
@@ -54,16 +50,14 @@ export function useStory(storyId: string) {
   return useQuery({
     queryKey: ['story', storyId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('stories')
-        .select('*, story_slides(*)')
-        .eq('id', storyId)
-        .eq('status', 'published')
-        .order('slide_index', { referencedTable: 'story_slides' })
-        .single()
-
-      if (error) throw error
-      return data as StoryDetail
+      const story = await pb.collection('stories').getOne(storyId, {
+        filter: 'status = "published"',
+        expand: 'story_slides(story)',
+        sort: 'story_slides(story).slide_index',
+      })
+      const slides =
+        (story.expand as Record<string, StorySlide[]> | undefined)?.['story_slides(story)'] ?? []
+      return { ...story, story_slides: slides } as StoryDetail
     },
     staleTime: 24 * 60 * 60 * 1000,
   })

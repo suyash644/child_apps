@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import type { AdminRole } from '@/lib/supabase/types'
+import { createClient } from '@/lib/pb/client'
+import type { AdminRole } from '@/lib/types'
 
 interface Props {
   adminRole: AdminRole | null
@@ -24,15 +24,16 @@ const NAV = [
 export default function Sidebar({ adminRole, displayName }: Props) {
   const pathname = usePathname()
   const router = useRouter()
-  const supabase = createClient()
+  const pb = createClient()
 
   const visibleNav = NAV.filter(
     (item) => adminRole === 'super_admin' || item.roles.includes(adminRole ?? ''),
   )
 
   async function signOut() {
-    await supabase.auth.signOut()
+    pb.authStore.clear()
     router.push('/login')
+    router.refresh()
   }
 
   return (

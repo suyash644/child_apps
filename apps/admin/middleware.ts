@@ -1,8 +1,7 @@
-import { createServerClient } from '@supabase/ssr'
+import PocketBase from 'pocketbase'
 import { NextResponse, type NextRequest } from 'next/server'
-import type { AdminRole } from '@/lib/supabase/types'
+import type { AdminRole } from '@/lib/types'
 
-// Routes accessible per role (super_admin passes all checks)
 const ROLE_ROUTES: Record<string, AdminRole[]> = {
   '/dashboard/stories':   ['content_manager', 'translator'],
   '/dashboard/shlokas':   ['content_manager', 'translator'],
@@ -15,57 +14,34 @@ const ROLE_ROUTES: Record<string, AdminRole[]> = {
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({ request })
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll: () => request.cookies.getAll(),
-        setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
-          )
-        },
-      },
-    },
-  )
+  const pb = new PocketBase(process.env.NEXT_PUBLIC_PB_URL ?? 'http://127.0.0.1:8090')
+  pb.authStore.loadFromCookie(request.headers.get('cookie') ?? '')
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const isLoggedIn = pb.authStore.isValid
 
-  // Unauthenticated → login
-  if (!user) {
+  if (!isLoggedIn) {
     if (!request.nextUrl.pathname.startsWith('/login')) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
     return response
   }
 
-  // Authenticated on /login → redirect to dashboard
   if (request.nextUrl.pathname === '/login') {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  // Fetch admin role from profiles (only for /dashboard routes)
   if (request.nextUrl.pathname.startsWith('/dashboard')) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('admin_role')
-      .eq('id', user.id)
-      .single()
+    const adminRole = (pb.authStore.model as Record<string, unknown>)?.admin_role as AdminRole | null
 
-    // No admin role = regular app user, not allowed in admin panel
-    if (!profile?.admin_role) {
+    if (!adminRole) {
       return NextResponse.redirect(new URL('/login?error=unauthorized', request.url))
     }
 
-    const role = profile.admin_role as AdminRole
-
-    // Check section-level access
     for (const [path, allowedRoles] of Object.entries(ROLE_ROUTES)) {
       if (
         request.nextUrl.pathname.startsWith(path) &&
-        role !== 'super_admin' &&
-        !allowedRoles.includes(role)
+        adminRole !== 'super_admin' &&
+        !allowedRoles.includes(adminRole)
       ) {
         return NextResponse.redirect(new URL('/dashboard', request.url))
       }

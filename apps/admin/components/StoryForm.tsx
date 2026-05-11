@@ -2,10 +2,10 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/pb/client'
 import MultilingualEditor from './MultilingualEditor'
 import ContentStatusBadge from './ContentStatusBadge'
-import type { Story, MultilingualText, AgeGroup, StoryCategory, ContentStatus } from '@/lib/supabase/types'
+import type { Story, MultilingualText, AgeGroup, StoryCategory, ContentStatus } from '@/lib/types'
 
 interface Props {
   story?: Story & { story_slides?: unknown[] }
@@ -31,41 +31,48 @@ const CATEGORIES: { value: StoryCategory; label: string }[] = [
 export default function StoryForm({ story }: Props) {
   const isEditing = Boolean(story)
   const router = useRouter()
-  const supabase = createClient()
+  const pb = createClient()
   const [isPending, startTransition] = useTransition()
 
-  const [title, setTitle]           = useState<MultilingualText>(story?.title ?? {})
-  const [description, setDesc]      = useState<MultilingualText>(story?.description ?? {})
-  const [category, setCategory]     = useState<StoryCategory>(story?.category ?? 'ganesha')
-  const [ageGroup, setAgeGroup]     = useState<AgeGroup>(story?.age_group ?? 'tiny_devotee')
-  const [isPremium, setIsPremium]   = useState(story?.is_premium ?? false)
-  const [status, setStatus]         = useState<ContentStatus>(story?.status ?? 'draft')
-  const [error, setError]           = useState('')
+  const [title, setTitle]         = useState<MultilingualText>(story?.title ?? {})
+  const [description, setDesc]    = useState<MultilingualText>(story?.description ?? {})
+  const [category, setCategory]   = useState<StoryCategory>(story?.category ?? 'ganesha')
+  const [ageGroup, setAgeGroup]   = useState<AgeGroup>(story?.age_group ?? 'tiny_devotee')
+  const [isPremium, setIsPremium] = useState(story?.is_premium ?? false)
+  const [status, setStatus]       = useState<ContentStatus>(story?.status ?? 'draft')
+  const [error, setError]         = useState('')
 
   async function save(nextStatus: ContentStatus) {
     setError('')
     startTransition(async () => {
       if (!title.hi) { setError('Hindi title is required.'); return }
 
-      const payload = { title, description, category, age_group: ageGroup, is_premium: isPremium, status: nextStatus }
-
-      if (isEditing) {
-        const { error: err } = await supabase.from('stories').update(payload).eq('id', story!.id)
-        if (err) { setError(err.message); return }
-      } else {
-        const { error: err } = await supabase.from('stories').insert(payload)
-        if (err) { setError(err.message); return }
+      const payload = {
+        title,
+        description,
+        category,
+        age_group: ageGroup,
+        is_premium: isPremium,
+        status: nextStatus,
       }
 
-      setStatus(nextStatus)
-      router.push('/dashboard/stories')
-      router.refresh()
+      try {
+        if (isEditing) {
+          await pb.collection('stories').update(story!.id, payload)
+        } else {
+          await pb.collection('stories').create(payload)
+        }
+        setStatus(nextStatus)
+        router.push('/dashboard/stories')
+        router.refresh()
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Failed to save story')
+      }
     })
   }
 
   return (
     <div className="max-w-2xl space-y-6">
-      {/* Status indicator */}
       {isEditing && (
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500">Current status:</span>
@@ -78,7 +85,6 @@ export default function StoryForm({ story }: Props) {
         </div>
       )}
 
-      {/* Category + Age group */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
@@ -106,22 +112,9 @@ export default function StoryForm({ story }: Props) {
         </div>
       </div>
 
-      {/* Multilingual title */}
-      <MultilingualEditor
-        label="Title"
-        value={title}
-        onChange={setTitle}
-      />
+      <MultilingualEditor label="Title" value={title} onChange={setTitle} />
+      <MultilingualEditor label="Description" value={description} onChange={setDesc} multiline />
 
-      {/* Multilingual description */}
-      <MultilingualEditor
-        label="Description"
-        value={description}
-        onChange={setDesc}
-        multiline
-      />
-
-      {/* Premium toggle */}
       <label className="flex items-center gap-3 cursor-pointer">
         <input
           type="checkbox"
@@ -137,7 +130,6 @@ export default function StoryForm({ story }: Props) {
         <p className="text-sm text-red-600 bg-red-50 rounded-lg px-4 py-2">{error}</p>
       )}
 
-      {/* Action buttons — workflow states */}
       <div className="flex gap-3 pt-2">
         <button
           onClick={() => save('draft')}

@@ -1,25 +1,26 @@
 import { useState } from 'react'
 import { View, Text, TextInput, Pressable, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native'
 import { router } from 'expo-router'
-import { supabase } from '@/lib/supabase'
+import { pb } from '@/lib/pb'
 
 export default function LoginScreen() {
-  const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  async function sendOtp() {
-    if (!phone.trim()) return
+  async function login() {
+    if (!email.trim() || !password.trim()) return
     setLoading(true)
     setError('')
 
-    const { error: err } = await supabase.auth.signInWithOtp({
-      phone: phone.startsWith('+') ? phone : `+91${phone}`,
-    })
-
+    try {
+      await pb.collection('users').authWithPassword(email.trim(), password)
+      // Root layout detects auth state change and redirects to (app)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Invalid email or password')
+    }
     setLoading(false)
-    if (err) { setError(err.message); return }
-    router.push({ pathname: '/(auth)/verify', params: { phone } })
   }
 
   return (
@@ -30,29 +31,41 @@ export default function LoginScreen() {
       <View style={styles.inner}>
         <Text style={styles.logo}>🕉</Text>
         <Text style={styles.title}>Dharma Seekho</Text>
-        <Text style={styles.subtitle}>Enter your mobile number to continue</Text>
+        <Text style={styles.subtitle}>Sign in to continue</Text>
 
         <TextInput
           style={styles.input}
-          placeholder="98765 43210"
+          placeholder="Email"
           placeholderTextColor="#bbb"
-          keyboardType="phone-pad"
-          value={phone}
-          onChangeText={setPhone}
-          maxLength={13}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#bbb"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+          onSubmitEditing={login}
         />
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
         <Pressable
-          onPress={sendOtp}
-          disabled={loading || phone.length < 10}
-          style={({ pressed }) => [styles.btn, (loading || phone.length < 10) && styles.btnDisabled, pressed && styles.pressed]}
+          onPress={login}
+          disabled={loading || !email || !password}
+          style={({ pressed }) => [
+            styles.btn,
+            (loading || !email || !password) && styles.btnDisabled,
+            pressed && styles.pressed,
+          ]}
         >
-          <Text style={styles.btnText}>{loading ? 'Sending OTP…' : 'Send OTP'}</Text>
+          <Text style={styles.btnText}>{loading ? 'Signing in…' : 'Sign in'}</Text>
         </Pressable>
-
-        <Text style={styles.hint}>We'll send a 6-digit code via SMS</Text>
       </View>
     </KeyboardAvoidingView>
   )
@@ -66,8 +79,7 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 15, textAlign: 'center', color: '#777', marginBottom: 32 },
   input: {
     borderWidth: 1.5, borderColor: '#e0e0e0', borderRadius: 14,
-    padding: 16, fontSize: 18, color: '#1a1a1a', letterSpacing: 1,
-    marginBottom: 12,
+    padding: 16, fontSize: 16, color: '#1a1a1a', marginBottom: 12,
   },
   btn: {
     backgroundColor: '#FF6B00', borderRadius: 14,
@@ -77,5 +89,4 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.85 },
   btnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   error: { color: '#e53e3e', fontSize: 13, marginBottom: 8, textAlign: 'center' },
-  hint: { color: '#aaa', fontSize: 12, textAlign: 'center', marginTop: 16 },
 })

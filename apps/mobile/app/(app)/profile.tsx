@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { View, Text, Pressable, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
-import { supabase } from '@/lib/supabase'
+import { pb } from '@/lib/pb'
 import { useStore } from '@/lib/store'
 import { router } from 'expo-router'
 
@@ -17,17 +17,18 @@ export default function ProfileScreen() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    supabase
-      .from('subscriptions')
-      .select('plan, status, expires_at')
-      .eq('status', 'active')
-      .maybeSingle()
-      .then(({ data }) => { setSubscription(data); setLoading(false) })
+    const userId = pb.authStore.model?.id
+    if (!userId) { setLoading(false); return }
+
+    pb.collection('subscriptions')
+      .getFirstListItem<Subscription>(`user = "${userId}" && status = "active"`)
+      .then((data) => { setSubscription(data); setLoading(false) })
+      .catch(() => setLoading(false))
   }, [])
 
   async function signOut() {
     setActiveChild(null)
-    await supabase.auth.signOut()
+    pb.authStore.clear()
     router.replace('/(auth)/login')
   }
 
@@ -37,7 +38,6 @@ export default function ProfileScreen() {
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <Text style={styles.heading}>Profile</Text>
 
-      {/* Child info */}
       {activeChild && (
         <View style={styles.card}>
           <Text style={styles.avatar}>
@@ -48,7 +48,6 @@ export default function ProfileScreen() {
         </View>
       )}
 
-      {/* Subscription status */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Subscription</Text>
         {loading ? (
@@ -73,7 +72,6 @@ export default function ProfileScreen() {
         )}
       </View>
 
-      {/* Sign out */}
       <Pressable onPress={signOut} style={styles.signOutBtn}>
         <Text style={styles.signOutText}>Sign Out</Text>
       </Pressable>

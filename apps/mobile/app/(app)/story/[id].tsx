@@ -8,7 +8,7 @@ import { useStory } from '@/hooks/useStories'
 import { prefetchStoryAudio } from '@/lib/audio'
 import { getText } from '@/lib/i18n'
 import AudioPlayer from '@/components/AudioPlayer'
-import { supabase } from '@/lib/supabase'
+import { pb } from '@/lib/pb'
 import type { LanguageCode } from '@/lib/i18n'
 
 export default function StoryPlayerScreen() {
@@ -34,13 +34,19 @@ export default function StoryPlayerScreen() {
 
   async function recordProgress(status: 'started' | 'completed') {
     if (!activeChild) return
-    await supabase.from('user_progress').upsert({
-      child_id: activeChild.id,
-      entity_type: 'story',
-      entity_id: id,
-      status,
-      last_slide_index: slideIndex,
-    }, { onConflict: 'child_id,entity_type,entity_id' })
+    try {
+      // Try to update existing record first, create if not found
+      const existing = await pb.collection('user_progress')
+        .getFirstListItem(`child_id = "${activeChild.id}" && entity_type = "story" && entity_id = "${id}"`)
+        .catch(() => null)
+
+      const payload = { child_id: activeChild.id, entity_type: 'story', entity_id: id, status, last_slide_index: slideIndex }
+      if (existing) {
+        await pb.collection('user_progress').update(existing.id, payload)
+      } else {
+        await pb.collection('user_progress').create(payload)
+      }
+    } catch { /* non-critical, swallow */ }
   }
 
   useEffect(() => { recordProgress('started') }, [])

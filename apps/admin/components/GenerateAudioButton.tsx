@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 
 interface Props {
   storyId: string
@@ -9,15 +8,23 @@ interface Props {
 
 export default function GenerateAudioButton({ storyId }: Props) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
-  const supabase = createClient()
 
   async function generate() {
     setStatus('loading')
-    const { error } = await supabase.functions.invoke('generate-story-audio', {
-      body: { story_id: storyId },
-    })
-    setStatus(error ? 'error' : 'done')
-    if (!error) setTimeout(() => setStatus('idle'), 3000)
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_PB_URL}/api/generate-story-audio`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ story_id: storyId }),
+        }
+      )
+      setStatus(res.ok ? 'done' : 'error')
+      if (res.ok) setTimeout(() => setStatus('idle'), 3000)
+    } catch {
+      setStatus('error')
+    }
   }
 
   return (
